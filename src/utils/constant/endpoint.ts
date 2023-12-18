@@ -1,0 +1,15 @@
+export const ApiRoutes  = {
+    ArticleList                 : "article/all",
+    ArticleCreate               : "article",
+    CodeGenerate                : "code/generate",
+    CodeList                    : "code/all",
+    DeviseList                  : "devise/all", 
+    DeviseUpdate                : "devise/update/taux", 
+    DeviseCreate                : "devise/", 
+    facturationList             : "facturation/all",
+    facturationCreate           : "facturation",
+    StockList                   : "stock/all",
+    StockCreate                 : "stock",
+    StockHistoriqueEntreeList   : "stock/historique/entree",
+    StockHistoriqueSortieList   : "stock/historique/sortie",
+}
