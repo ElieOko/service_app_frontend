@@ -103,6 +103,7 @@ const submit_facturation = async ()=>{
                 notify(response.data.message);
                 if(response.data.message == "Enregistrement réussie avec succès"){
                     facturationList.value = response.data.facturation as Array<IFacturation>
+                    console.log("test", facturationList)  
                 }
             })
             .catch(function (error) {

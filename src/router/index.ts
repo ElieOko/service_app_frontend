@@ -29,6 +29,8 @@ import SignalView from '../views/signal/SignalView.vue'
 import AppendSignalView from '../views/signal/AppendSignalView.vue'
 //@ts-ignore
 import AppendTauxView from '../views/taux/AppendTauxView.vue'
+//@ts-ignore
+import ErrorView from '../views/ErrorView.vue'
 import { getUser } from '@/stores/user'
 
 const routes : RouteRecordRaw[] =  [
@@ -117,6 +119,12 @@ const routes : RouteRecordRaw[] =  [
       component: AppendSignalView,
       meta:{ requiresAuth: true , reload: true}
     }, 
+    { 
+      path: '/:catchAll(.*)',
+      component:ErrorView,
+      meta: { layout: 'empty' }
+    // component: 
+     }
   ]
 const router = createRouter({
   history: createWebHistory(),
