@@ -98,8 +98,8 @@ const submit_facturation = async ()=>{
     notify("Entrez les informations valides");
   }
   else{
-    await(useAxiosRequestWithToken().post(`${ApiRoutes.facturationCreate}`,data)
-            .then(function (response) {
+    await(useAxiosRequestWithToken().post(`${ApiRoutes.facturationCreate}`,data).then(function (response) {
+              console.log(response)
                 notify(response.data.message);
                 if(response.data.message == "Enregistrement réussie avec succès"){
                     facturationList.value = response.data.facturation as Array<IFacturation>
