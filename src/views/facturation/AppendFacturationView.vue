@@ -4,7 +4,8 @@ import type { ICodeFacture } from '@/utils/interface/ICodeFacture';
 import type { IFacturation, IFacturationRequest } from '@/utils/interface/IFacturation';
 import type { IStock } from '@/utils/interface/IStock';
 import { useAxiosRequestWithToken } from '@/utils/service/api';
-import type { CompositeFilterDescriptor, SortDescriptor } from '@progress/kendo-data-query';
+import { process, filterBy, type CompositeFilterDescriptor, type SortDescriptor } from '@progress/kendo-data-query';
+import { Grid, GridToolbar } from '@progress/kendo-vue-grid';
 import { ref, watchEffect } from 'vue';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
@@ -171,8 +172,8 @@ const submit_facturation = async ()=>{
   <grid
     @pagechange="pageChangeHandler"
     :total ="facturationList?.length"
-    :data-items="facturationList"
-    :columns="columnsFacturation as any"
+    :data-items="(facturationList as any)"
+    :columns="columnsFacturation"
     :edit-field="'inEdit'"
     :filter="filter"
     @filterchange="filterChange"
