@@ -23,6 +23,9 @@ export const columnsArticle = [
     { field:'devise.code',title:"Devise",filter:'number',editable: false},
     { field:'created_at',title:"Date création article",filter:'date',editable: false},
 ];
+
+
+
 export const columnsStockSortie = [
     { field: 'id',title:"N",editable: false},
     { field:'stock.article.nom',title:"Nom Article",filter:'text',editable: false},
@@ -34,15 +37,14 @@ export const columnsStockSortie = [
     { field:'dateSortie',title:"Date des Sorties",filter:'date',editable: false},
 ];
 
-
 export const columnsFacturation = [
     { field: 'id',title:"N",editable: false},
-    { field:'code',title:"Nom Article",filter:'text',editable: false},
-    { field:'article.nom',title:"Devise",filter:'number',editable: false},
+    { field:'code.nom',title:"Code Facturation",filter:'text',editable: false},
+    { field:'stock.article.nom',title:"Marchandise",filter:'number',editable: false},
     { field:'quantite',title:"Quantité",filter:'number',editable: false},
-    { field:'article.prixUnitaire',title:"Prix Unitaire",filter:'number',editable: false},
+    { field:'stock.article.prixUnitaire',title:"Prix Unitaire",filter:'number',editable: false},
     { field:'prixTotal',title:"Prix Total",filter:'number',editable: false},
-    { field:'dateCreation',title:"Date de création",filter:'date',editable: false},
+    { field:'created_at',title:"Date de création",filter:'date',editable: false},
 ];
 
 // id          : number

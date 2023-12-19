@@ -1,10 +1,13 @@
+import type { ICodeFacture } from "./ICodeFacture"
+import type { IStock } from "./IStock"
+
 export interface IFacturation{
-    id          : number
-    code        : string
-    quantite    : number
-    stock_fk    : number
-    prixTotal   : number
-    dateCreated : string
+    id           : number
+    codes        : ICodeFacture
+    quantite     : number
+    stocks       : IStock
+    prixTotal    : number
+    dateCreated  : string
 }
 export interface IFacturationRequest{
     stock_fk     : number

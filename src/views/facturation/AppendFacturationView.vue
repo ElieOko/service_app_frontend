@@ -1,20 +1,61 @@
 <script lang="ts" setup>
 import { ApiRoutes } from '@/utils/constant/endpoint';
 import type { ICodeFacture } from '@/utils/interface/ICodeFacture';
-import type { IFacturationRequest } from '@/utils/interface/IFacturation';
-import type { IHistoriqueStockSortieRequest } from '@/utils/interface/IHistoriqueStockSortie';
+import type { IFacturation, IFacturationRequest } from '@/utils/interface/IFacturation';
 import type { IStock } from '@/utils/interface/IStock';
 import { useAxiosRequestWithToken } from '@/utils/service/api';
+import type { CompositeFilterDescriptor, SortDescriptor } from '@progress/kendo-data-query';
 import { ref, watchEffect } from 'vue';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 
+const columnsFacturation = [
+    { field: 'id',title:"N",editable: false},
+    { field:'code.nom',title:"Code Facturation",filter:'text',editable: false},
+    { field:'stock.article.nom',title:"Marchandise",filter:'number',editable: false},
+    { field:'quantite',title:"Quantité",filter:'number',editable: false},
+    { field:'stock.article.prixUnitaire',title:"Prix Unitaire",filter:'number',editable: false},
+    { field:'prixTotal',title:"Prix Total",filter:'number',editable: false},
+    { field:'created_at',title:"Date de création",filter:'date',editable: false},
+];
 const facturation = ref<IFacturationRequest>({
     stock_fk : 0,
     quantite : 0,
     code_fk  : 0,
 })
+const facturationList = ref<Array<IFacturation>>([])
+const loader       = ref<Boolean>(false)
+const gridPageable = {
+        buttonCount: 5,
+        info: true,
+        type: 'numeric',
+        pageSizes: true,
+        previousNext: true,
+      } 
+  const sortable = ref(true);
+  const skip = ref<number>(0);
+  const take = ref<number>(4);
+  const sort = ref<SortDescriptor[] | undefined>([
+      { field: "id", dir: "asc" }
+    ]);
+  const filter = ref<CompositeFilterDescriptor>({logic: "and", filters: []});
+    const pageChangeHandler = (event:any) => {
+      loader.value = true;
+      setTimeout(() => {
+       loader.value = false;
+        skip.value = event.page.skip;
+        take.value = event.page.take;
+      }, 300);
+    }
 
+    const filterChange =  (ev:any)=> {
+      loader.value = true;
+      console.log(ev);
+      setTimeout(() => {
+        filter.value = ev.filter;
+        loader.value = false;
+      }, 300);
+    } 
 const notify = (msg:string) => {
       toast(msg, {
         autoClose: 8000,
@@ -59,7 +100,10 @@ const submit_facturation = async ()=>{
   else{
     await(useAxiosRequestWithToken().post(`${ApiRoutes.facturationCreate}`,data)
             .then(function (response) {
-                // notify(response.message as string);
+                notify(response.data.message);
+                if(response.data.message == "Enregistrement réussie avec succès"){
+                    facturationList.value = response.data.facturation as Array<IFacturation>
+                }
             })
             .catch(function (error) {
                notify(error)
@@ -118,8 +162,26 @@ const submit_facturation = async ()=>{
                                 </div>
                             </div>
                         <button type="submit" class="text-white mt-5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Sortir au stock</button>
+                        <button @click="generate_code" type="button" class="text-white mt-5 bg-gray-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Imprimer</button>
                     </form>
                 </div>
             </main>
-
+            <div class="mt-8" />
+  <grid
+    @pagechange="pageChangeHandler"
+    :total ="facturationList?.length"
+    :data-items="facturationList"
+    :columns="columnsFacturation as any"
+    :edit-field="'inEdit'"
+    :filter="filter"
+    @filterchange="filterChange"
+    :loader="loader"
+    :column-menu="true"
+    :pageable="gridPageable"
+    :sortable="sortable"
+    :sort="sort"
+    :take="take"
+    :skip="skip"
+    >
+  </grid>
 </template>
