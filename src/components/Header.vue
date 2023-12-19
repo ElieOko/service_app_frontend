@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { clearUser } from '@/stores/user';
 import { useSidebar } from '@/utils/constant/fun';
 import { ref } from 'vue'
 
@@ -86,12 +87,11 @@ const { isOpen } = useSidebar()
           >
            
            
-            <router-link
-              to="/"
+            <button @click="clearUser()"
               class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-600 hover:text-white"
             >
               Deconnexion
-            </router-link>
+            </button>
           </div>
         </transition>
       </div>

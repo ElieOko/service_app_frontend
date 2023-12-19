@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory,  type RouteRecordRaw } from 'vue-router'
 //@ts-ignore
 import HomeView from '../views/HomeView.vue'
 //@ts-ignore
@@ -27,14 +27,16 @@ import HistoriqueSortieStockView from '../views/stock/HistoriqueSortieStockView.
 import SignalView from '../views/signal/SignalView.vue'
 //@ts-ignore
 import AppendSignalView from '../views/signal/AppendSignalView.vue'
+//@ts-ignore
+import AppendTauxView from '../views/taux/AppendTauxView.vue'
+import { getUser } from '@/stores/user'
 
-const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
+const routes : RouteRecordRaw[] =  [
     {
       path: '/',
       name: 'home',
-      component: HomeView
+      component: HomeView,
+      meta:{ requiresAuth: true , reload: true}
     },
     {
       path: '/register',
@@ -51,54 +53,81 @@ const router = createRouter({
     {
       path: '/article/add',
       name: 'article_add',
-      component: AppendArticleView
+      component: AppendArticleView,
+      meta:{ requiresAuth: true , reload: true}
     },
     {
       path: '/article',
       name: 'article',
-      component: ArticleView
+      component: ArticleView,
+      meta:{ requiresAuth: true , reload: true}
     },
     {
       path: '/facturation',
       name: 'facturation',
-      component: FacturationView
+      component: FacturationView,
+      meta:{ requiresAuth: true , reload: true}
+
     },
     {
       path: '/facturation/add',
       name: 'facturation_add',
-      component: AppendFacturationView
+      component: AppendFacturationView,
+      meta:{ requiresAuth: true , reload: true}
+    },
+    {
+      path: '/taux',
+      name: 'taux',
+      component: AppendTauxView,
+      meta:{ requiresAuth: true , reload: true}
     },
     {
       path: '/stock/add',
       name: 'stock_add',
-      component: AppendStockView
+      component: AppendStockView,
+      meta:{ requiresAuth: true , reload: true}
     },
     {
       path: '/stock',
       name: 'stock',
-      component: StockView
+      component: StockView,
+
     },
     {
       path: '/stock/historique/entree',
       name: 'stock_historique_entree',
-      component: HistoriqueEntreeStockView
+      component: HistoriqueEntreeStockView,
+      meta:{ requiresAuth: true , reload: true}
     },
     {
       path: '/stock/historique/sortie',
       name: 'stock_historique_sortie',
-      component: HistoriqueSortieStockView
+      component: HistoriqueSortieStockView,
+      meta:{ requiresAuth: true , reload: true}
     },
     {
       path: '/signal',
       name: 'signal',
-      component: SignalView
+      component: SignalView,
+      meta:{ requiresAuth: true , reload: true}
     },
     {
       path: '/signal/add',
       name: 'signal_add',
-      component: AppendSignalView
+      component: AppendSignalView,
+      meta:{ requiresAuth: true , reload: true}
     }, 
   ]
+const router = createRouter({
+  history: createWebHistory(),
+  routes,
 })
-
+router.beforeEach((to, from, next) => {
+  //const store = useTestStore()
+  if (to.meta.requiresAuth && getUser() == null) {
+    next('/login'); // Rediriger vers la page de connexion si l'utilisateur n'est pas authentifié
+  } else {
+    next(); // Permettre l'accès à la page demandée
+  }
+});
 export default router
