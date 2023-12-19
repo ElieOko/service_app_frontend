@@ -6,7 +6,7 @@ import { ref, watchEffect } from 'vue';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 
-const devise = ref<Array<IDevise>>()
+const devise = ref<Array<IDevise>>([])
 const deviseRequest = ref<IDevise>({
   taux:0
 }) 
@@ -73,7 +73,7 @@ const deviseRequest = ref<IDevise>({
                 Taux du jour
               </h4>
               <div class="text-gray-500">
-                devise?[0].taux
+               {{ devise[0]?.taux}}
               </div>
             </div>
           </div>
