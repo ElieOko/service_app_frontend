@@ -1,11 +1,11 @@
 export interface IUser{
-    nomUser  : string
+    username  : string
     role     : string
     password : string
     isActive : boolean
 }
 
 export interface IAuth{
-    nomUser  : string
+    username  : string
     password : string
 }

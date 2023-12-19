@@ -6,6 +6,8 @@ export const ApiRoutes  = {
     DeviseList                  : "devise/all", 
     DeviseUpdate                : "devise/update/taux", 
     DeviseCreate                : "devise/", 
+    LoginUser                   : "login",
+    RegisterUser                : "register",
     facturationList             : "facturation/all",
     facturationCreate           : "facturation",
     StockList                   : "stock/all",
