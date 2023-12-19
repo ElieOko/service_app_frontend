@@ -4,7 +4,7 @@ export const ApiRoutes  = {
     CodeGenerate                : "code/generate",
     CodeList                    : "code/all",
     DeviseList                  : "devise/all", 
-    DeviseUpdate                : "devise/update/taux", 
+    DeviseUpdate                : "devise/edit/taux", 
     DeviseCreate                : "devise/", 
     LoginUser                   : "login",
     RegisterUser                : "register",

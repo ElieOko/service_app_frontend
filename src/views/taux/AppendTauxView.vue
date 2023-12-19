@@ -10,7 +10,8 @@ const devise = ref<Array<IDevise>>([])
 const deviseRequest = ref<IDevise>({
   taux:0
 }) 
-    watchEffect(async()=>{
+    const fun_devise = ()=>{
+      watchEffect(async()=>{
         await(useAxiosRequestWithToken().get(`${ApiRoutes.DeviseList}`)
             .then(function (response) {
                 console.log("devise",response.data)
@@ -23,6 +24,8 @@ const deviseRequest = ref<IDevise>({
                 //alert("Elie Oko");
             }));
     })
+    }
+    fun_devise()
     const notify = (msg:string) => {
       toast(msg, {
         autoClose: 8000,
@@ -30,13 +33,16 @@ const deviseRequest = ref<IDevise>({
       }
     const submit_stock = async ()=>{
         const data = (JSON.parse(JSON.stringify(deviseRequest.value))) as IDevise ;
-        if( data.taux == 0 ){
-            notify("Certains champs sont vide");
+        if( data.taux ){
+          if( data.taux < 900  ){
+            notify("Cette valeurs est très faible");
             return
+          }  
         }
-        await(useAxiosRequestWithToken().post(`${ApiRoutes.DeviseUpdate}/${1}`,data)
+        await(useAxiosRequestWithToken().post(`${ApiRoutes.DeviseUpdate}`,data)
             .then(function (response) {
                 notify(response.data.message)
+                fun_devise()
             })
             .catch(function (error) {
                 console.log(error);
