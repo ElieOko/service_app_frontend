@@ -34,7 +34,7 @@ const deviseRequest = ref<IDevise>({
     const submit_stock = async ()=>{
         const data = (JSON.parse(JSON.stringify(deviseRequest.value))) as IDevise ;
         if( data.taux ){
-          if( data.taux < 900  ){
+          if( data.taux < 900 || data.taux == 0 ){
             notify("Cette valeurs est très faible");
             return
           }  
