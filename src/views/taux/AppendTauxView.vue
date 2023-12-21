@@ -8,7 +8,7 @@ import 'vue3-toastify/dist/index.css';
 
 const devise = ref<Array<IDevise>>([])
 const deviseRequest = ref<IDevise>({
-  taux:0
+  taux:1
 }) 
     const fun_devise = ()=>{
       watchEffect(async()=>{
@@ -107,3 +107,16 @@ const deviseRequest = ref<IDevise>({
             </main>
 
 </template>
+<style>
+  .spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #25353f;
+  border-radius: 50%;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>

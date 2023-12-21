@@ -27,6 +27,7 @@ const facturation = ref<IFacturationRequest>({
 const totalPrice = ref<number>(0)
 const qte  = ref<number>(0)
 const mr = ref<string>("")
+const showLoad = ref<boolean>(false)
 const printer = ():Boolean =>{
         var new_str = ((document.getElementById("printable-content")) as HTMLElement).innerHTML; 
         var old_str = document.body.innerHTML; 
@@ -106,9 +107,11 @@ const generate_code = async()=>{
 }
 
 const submit_facturation = async ()=>{
+  showLoad.value = true
   const data = (JSON.parse(JSON.stringify(facturation.value))) as IFacturationRequest ;
   if(data.code_fk == 0 || data.quantite == 0 || data.stock_fk == 0){
     notify("Entrez les informations valides");
+    showLoad.value = false
   }
   else{
     await(useAxiosRequestWithToken().post(`${ApiRoutes.facturationCreate}`,data).then(function (response) {
@@ -117,7 +120,6 @@ const submit_facturation = async ()=>{
                 if(response.data.message == "Enregistrement réussie avec succès"){
                     facturationList.value = response.data.facturation as Array<IFacturation>
                     console.log("test", facturationList) 
-                   
                     facturationList.value.map((v:IFacturation,k:number)=>{
                       mr.value = v.codes.nom
                       totalPrice.value += v.prixTotal
@@ -130,6 +132,7 @@ const submit_facturation = async ()=>{
             })
             .finally(function () {
                 //alert("Elie Oko");
+                showLoad.value = false
             }));
   }
 
@@ -181,7 +184,7 @@ const submit_facturation = async ()=>{
                                     </div>
                                 </div>
                             </div>
-                        <button type="submit" class="text-white mt-5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Sortir au stock</button>
+                        <button type="submit" class="text-white mt-5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Sortir au stock <svg v-if="showLoad" class="spinner inline h-6 w-6 mr-3" viewBox="0 0 4 4"></svg></button>
                         <button @click="printer" type="button" class="text-white mt-5 bg-gray-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Imprimer</button>
                     </form>
                 </div>
@@ -199,11 +202,8 @@ const submit_facturation = async ()=>{
                 :data-items="(facturationList as any)"
                 :columns="columnsFacturation"
                 :edit-field="'inEdit'"
-               
                 @filterchange="filterChange"
-                :loader="loader"
-               
-                >
+                :loader="loader">
               </grid>
                     
                     <div class="w-full overflow-hidden rounded-lg shadow-xs">
@@ -244,3 +244,16 @@ const submit_facturation = async ()=>{
                     </div>
                     </main>
 </template>
+<style>
+  .spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #25353f;
+  border-radius: 50%;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>

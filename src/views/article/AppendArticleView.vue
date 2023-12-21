@@ -11,6 +11,7 @@ import 'vue3-toastify/dist/index.css';
         prixUnitaire : 0,
         devise_fk :0
     });
+    const showLoad = ref<boolean>(false)
     const devise = ref<Array<IDevise>>()
     const errorPrix = computed(() => {
       return article.value.prixUnitaire === 0 || article.value.prixUnitaire === "" ? "Entrez le  prix unitaire valide" : "";
@@ -40,6 +41,7 @@ import 'vue3-toastify/dist/index.css';
       });
       }
     const submit_new_article = async ()=>{
+        showLoad.value =  true
         const data = (JSON.parse(JSON.stringify(article.value))) as IArticleRequest ;
         if( data.devise_fk == 0 || data.prixUnitaire == 0 ||  data.nom == "" ){
             notify("Certains champs sont vide");
@@ -54,6 +56,7 @@ import 'vue3-toastify/dist/index.css';
             })
             .finally(function () {
                 //alert("Elie Oko");
+                showLoad.value = false
             }))
     }
 </script>
@@ -95,7 +98,9 @@ import 'vue3-toastify/dist/index.css';
                             </div>
                         </div>
                         <div class="w-full md:w-1/2 mt-6 px-3">
-                            <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-1 focus:ring-blue-300 font-medium rounded-lg text-sm px-6 py-3 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Ajouter</button>
+                            <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-1 focus:ring-blue-300 font-medium rounded-lg text-sm px-6 py-3 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                                Sauvegarder  <svg v-if="showLoad" class="spinner inline h-6 w-6 mr-3" viewBox="0 0 4 4"></svg>
+                           </button>
                         </div>
 
                     </form>
@@ -104,3 +109,16 @@ import 'vue3-toastify/dist/index.css';
                 </div>
             </main>
 </template>
+<style>
+  .spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #25353f;
+  border-radius: 50%;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>

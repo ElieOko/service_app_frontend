@@ -13,6 +13,7 @@ const stock = ref<IStockRequest>({
   quantiteEntree :0
 
 })
+const showLoad = ref<boolean>(false)
 const article = ref<Array<IArticle>>([])
   const notify = (msg:string) => {
       toast(msg, {
@@ -32,6 +33,7 @@ watchEffect(async()=>{
             }));
     })
     const submit_stock = async ()=>{
+        showLoad.value = true
         const data = (JSON.parse(JSON.stringify(stock.value))) as IStockRequest ;
         if( data.article_fk == 0 || data.quantiteEntree == 0 ){
             notify("Certains champs sont vide");
@@ -46,6 +48,7 @@ watchEffect(async()=>{
             })
             .finally(function () {
                 //alert("Elie Oko");
+                showLoad.value = false
             }))
     }    
 </script>
@@ -77,7 +80,7 @@ watchEffect(async()=>{
                                 <input v-model="stock.quantiteEntree" class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-zip" type="number" placeholder="90210">
                             </div>
                         </div>
-                        <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Ajouter au stock</button>
+                        <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Ajouter au stock <svg v-if="showLoad" class="spinner inline h-6 w-6 mr-3" viewBox="0 0 4 4"></svg></button>
                     </form>
 
                   
@@ -85,3 +88,16 @@ watchEffect(async()=>{
             </main>
 
 </template>
+<style>
+  .spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #25353f;
+  border-radius: 50%;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
