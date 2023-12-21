@@ -65,7 +65,7 @@ watchEffect(async()=>{
 <template>
   <grid
     @pagechange="pageChangeHandler"
-    :total ="stockSortie.length"
+    :total ="stockSortie?.length"
     :data-items="stockSortie"
     :columns="columnsStockSortie as any"
     :edit-field="'inEdit'"

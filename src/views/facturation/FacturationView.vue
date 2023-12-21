@@ -101,7 +101,7 @@ watchEffect(async()=>{
   <div class="mt-8" />
   <grid
     @pagechange="pageChangeHandler"
-    :total ="facturationList.length"
+    :total ="facturationList?.length"
     :data-items="facturationList"
     :columns="columnsFacturation as any"
     :edit-field="'inEdit'"
