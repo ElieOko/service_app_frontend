@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { columnsStockSortie } from '@/utils/constant/columun';
+import { ApiRoutes } from '@/utils/constant/endpoint';
+import { dateConvert } from '@/utils/constant/fun';
+import type { IHistoriqueStockSortie } from '@/utils/interface/IHistoriqueStockSortie';
+import { useAxiosRequestWithToken } from '@/utils/service/api';
 import { process, filterBy, type CompositeFilterDescriptor, type SortDescriptor } from '@progress/kendo-data-query';
 import { Grid, GridToolbar } from '@progress/kendo-vue-grid';
-import { ref } from 'vue';
+import { ref, watchEffect } from 'vue';
 
 const loader       = ref<Boolean>(false)
 const gridPageable = {
@@ -16,7 +20,7 @@ const gridPageable = {
   const skip = ref<number>(0);
   const take = ref<number>(4);
   const sort = ref<SortDescriptor[] | undefined>([
-      { field: "TicketId", dir: "asc" }
+      { field: "id", dir: "asc" }
     ]);
   const filter = ref<CompositeFilterDescriptor>({logic: "and", filters: []});
     const pageChangeHandler = (event:any) => {
@@ -40,14 +44,29 @@ const gridPageable = {
 const data : any = [{
   "id" : 1
 }]
-
+const stockSortie = ref<Array<IHistoriqueStockSortie>>([])
+watchEffect(async()=>{
+        await(useAxiosRequestWithToken().get(`${ApiRoutes.StockHistoriqueSortieList}`)
+            .then(function (response) {
+                stockSortie.value = response.data.stock_historique_sortie as Array<IHistoriqueStockSortie>
+                stockSortie.value?.map((v:IHistoriqueStockSortie,k:number)=>{
+                stockSortie.value[k].created_at = dateConvert(v.created_at)
+                })
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+            .finally(function () {
+                //alert("Elie Oko");
+            }));
+    })
 
 </script>
 <template>
   <grid
     @pagechange="pageChangeHandler"
-    :total ="18"
-    :data-items="data"
+    :total ="stockSortie.length"
+    :data-items="stockSortie"
     :columns="columnsStockSortie as any"
     :edit-field="'inEdit'"
     :filter="filter"

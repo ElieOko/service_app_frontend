@@ -24,12 +24,13 @@ const facturation = ref<IFacturationRequest>({
     quantite : 0,
     code_fk  : 0,
 })
+const totalPrice = ref<number>(0)
+const qte  = ref<number>(0)
+const mr = ref<string>("")
 const printer = ():Boolean =>{
-        var header_str = '<html><head><title></title></head><body>'; 
-        var footer_str = '</body></html>'; 
         var new_str = ((document.getElementById("printable-content")) as HTMLElement).innerHTML; 
         var old_str = document.body.innerHTML; 
-        document.body.innerHTML = header_str + new_str + footer_str; 
+        document.body.innerHTML =new_str ; 
         window.print(); 
         document.body.innerHTML = old_str;
         return false
@@ -114,7 +115,13 @@ const submit_facturation = async ()=>{
                 notify(response.data.message);
                 if(response.data.message == "Enregistrement réussie avec succès"){
                     facturationList.value = response.data.facturation as Array<IFacturation>
-                    console.log("test", facturationList)  
+                    console.log("test", facturationList) 
+                   
+                    facturationList.value.map((v:IFacturation,k:number)=>{
+                      mr.value = v.codes.nom
+                      totalPrice.value += v.prixTotal
+                      qte.value += v.quantite
+                    })
                 }
             })
             .catch(function (error) {
@@ -179,9 +186,10 @@ const submit_facturation = async ()=>{
                 </div>
             </main>
             <div class="mt-8" />
+            <main>
             <div id ="printable-content">
-              <h2>Facturation </h2>
-              <grid
+           
+              <!-- <grid
                 @pagechange="pageChangeHandler"
                 :total ="facturationList?.length"
                 :data-items="(facturationList as any)"
@@ -197,8 +205,48 @@ const submit_facturation = async ()=>{
                 :take="take"
                 :skip="skip"
                 >
-              </grid>
+              </grid> -->
 
-            </div>
-
+         
+                    <h4 class="mb-4 text-lg font-semibold text-gray-600 dark:text-gray-300">
+                       Facturation {{ mr }}
+                    </h4>
+                    <div class="w-full overflow-hidden rounded-lg shadow-xs">
+                        <div class="w-full overflow-x-auto">
+            <table class="w-full whitespace-no-wrap">
+                                <thead>
+                                    <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
+                                        <th class="px-4 py-3">Marchandise</th>
+                                        <th class="px-4 py-3">Quantité</th>
+                                        <th class="px-4 py-3">Prix Unitaire</th>
+                                        <th class="px-4 py-3">Prix total</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
+                                    <tr v-for="item in facturationList" class="text-gray-700 dark:text-gray-400">
+                                        <td class="px-4 py-3 text-sm">
+                                            {{item.stocks.article.nom }}
+                                        </td>
+                                        <td class="px-4 py-3 text-sm">
+                                            {{ item.quantite }}
+                                        </td>
+                                        <td class="px-4 py-3 text-sm">
+                                          {{ item.stocks.article.prixUnitaire }}
+                                        </td>
+                                        <td class="px-4 py-3 text-sm">
+                                            {{item.prixTotal }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                          <div class="grid px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
+                            <span class="flex items-center col-span-3">
+                            {{ "Montant à payer " + totalPrice }} <br/>
+                            {{ "Quantité Sortie " + qte }} <br/>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    </main>
 </template>

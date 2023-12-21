@@ -6,7 +6,7 @@ export interface IHistoriqueStockSortie{
     quantite     : number
     prixUnitaire : number
     prixTotal    : number
-    dateCreated  : string
+    created_at  : string
 }
 
 export interface IHistoriqueStockSortieRequest{

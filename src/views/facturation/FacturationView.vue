@@ -1,9 +1,24 @@
 <script setup lang="ts">
-import { columnsFacturation } from '@/utils/constant/columun';
+//import { columnsFacturation } from '@/utils/constant/columun';
+import { ApiRoutes } from '@/utils/constant/endpoint';
+import { dateConvert } from '@/utils/constant/fun';
+import type { IFacturation } from '@/utils/interface/IFacturation';
+import { useAxiosRequestWithToken } from '@/utils/service/api';
 import { process, filterBy, type CompositeFilterDescriptor, type SortDescriptor } from '@progress/kendo-data-query';
 import { Grid, GridToolbar } from '@progress/kendo-vue-grid';
-import { ref } from 'vue';
+import { ref, watchEffect } from 'vue';
 
+
+
+const columnsFacturation = [
+    { field: 'id',title:"N",editable: false},
+    { field:'code.nom',title:"Code Facturation",filter:'text',editable: false},
+    { field:'stock.article.nom',title:"Marchandise",filter:'number',editable: false},
+    { field:'quantite',title:"Quantité",filter:'number',editable: false},
+    { field:'stock.article.prixUnitaire',title:"Prix Unitaire",filter:'number',editable: false},
+    { field:'prixTotal',title:"Prix Total",filter:'number',editable: false},
+    { field:'created_at',title:"Date de création",filter:'date',editable: false},
+];
 const loader       = ref<Boolean>(false)
 const gridPageable = {
         buttonCount: 5,
@@ -40,7 +55,20 @@ const gridPageable = {
 const data : any = [{
   "id" : 1
 }]
-
+const facturationList = ref<Array<IFacturation>>([])
+watchEffect(async()=>{
+        await(useAxiosRequestWithToken().get(`${ApiRoutes.facturationList}`)
+            .then(function (response) {
+              facturationList.value = response.data.facturation as Array<IFacturation>
+               
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+            .finally(function () {
+                //alert("Elie Oko");
+            }));
+    })
 
 </script>
 <template>
@@ -73,8 +101,8 @@ const data : any = [{
   <div class="mt-8" />
   <grid
     @pagechange="pageChangeHandler"
-    :total ="18"
-    :data-items="data"
+    :total ="facturationList.length"
+    :data-items="facturationList"
     :columns="columnsFacturation as any"
     :edit-field="'inEdit'"
     :filter="filter"

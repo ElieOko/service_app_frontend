@@ -30,11 +30,8 @@ export const columnsStockSortie = [
     { field: 'id',title:"N",editable: false},
     { field:'stock.article.nom',title:"Nom Article",filter:'text',editable: false},
     { field:'quantite',title:"Quantité Sortie",filter:'number',editable: false},
-    { field:'type',title:"Recipient",filter:'text',editable: false},
     { field:'prixUnitaire',title:"Prix Unitaire",filter:'number',editable: false},
-    { field:'devise',title:"Devise",filter:'text',editable: false},
-    { field:'prixTotal',title:"Prix de Vente total",filter:'number',editable: false},
-    { field:'dateSortie',title:"Date des Sorties",filter:'date',editable: false},
+    { field:'prixTotal',title:"Prix de Vente total",filter:'number',editable: false}
 ];
 
 export const columnsFacturation = [
