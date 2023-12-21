@@ -59,8 +59,9 @@ const facturationList = ref<Array<IFacturation>>([])
 watchEffect(async()=>{
         await(useAxiosRequestWithToken().get(`${ApiRoutes.facturationList}`)
             .then(function (response) {
-              facturationList.value = response.data.facturation as Array<IFacturation>
-               
+              facturationList.value = response.data.facturations as Array<IFacturation>
+              console.log(response.data)  
+    
             })
             .catch(function (error) {
                 console.log(error);

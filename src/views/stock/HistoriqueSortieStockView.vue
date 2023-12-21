@@ -48,10 +48,8 @@ const stockSortie = ref<Array<IHistoriqueStockSortie>>([])
 watchEffect(async()=>{
         await(useAxiosRequestWithToken().get(`${ApiRoutes.StockHistoriqueSortieList}`)
             .then(function (response) {
-                stockSortie.value = response.data.stock_historique_sortie as Array<IHistoriqueStockSortie>
-                stockSortie.value?.map((v:IHistoriqueStockSortie,k:number)=>{
-                stockSortie.value[k].created_at = dateConvert(v.created_at)
-                })
+                stockSortie.value = response.data.stock_historique_sorties as Array<IHistoriqueStockSortie>
+                console.log(stockSortie.value)
             })
             .catch(function (error) {
                 console.log(error);
@@ -60,7 +58,7 @@ watchEffect(async()=>{
                 //alert("Elie Oko");
             }));
     })
-
+  
 </script>
 <template>
   <grid
