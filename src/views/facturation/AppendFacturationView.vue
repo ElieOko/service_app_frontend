@@ -24,6 +24,16 @@ const facturation = ref<IFacturationRequest>({
     quantite : 0,
     code_fk  : 0,
 })
+const printer = ():Boolean =>{
+        var header_str = '<html><head><title></title></head><body>'; 
+        var footer_str = '</body></html>'; 
+        var new_str = ((document.getElementById("printable-content")) as HTMLElement).innerHTML; 
+        var old_str = document.body.innerHTML; 
+        document.body.innerHTML = header_str + new_str + footer_str; 
+        window.print(); 
+        document.body.innerHTML = old_str;
+        return false
+    }
 const facturationList = ref<Array<IFacturation>>([])
 const loader       = ref<Boolean>(false)
 const gridPageable = {
@@ -164,26 +174,31 @@ const submit_facturation = async ()=>{
                                 </div>
                             </div>
                         <button type="submit" class="text-white mt-5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Sortir au stock</button>
-                        <button @click="generate_code" type="button" class="text-white mt-5 bg-gray-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Imprimer</button>
+                        <button @click="printer" type="button" class="text-white mt-5 bg-gray-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Imprimer</button>
                     </form>
                 </div>
             </main>
             <div class="mt-8" />
-  <grid
-    @pagechange="pageChangeHandler"
-    :total ="facturationList?.length"
-    :data-items="(facturationList as any)"
-    :columns="columnsFacturation"
-    :edit-field="'inEdit'"
-    :filter="filter"
-    @filterchange="filterChange"
-    :loader="loader"
-    :column-menu="true"
-    :pageable="gridPageable"
-    :sortable="sortable"
-    :sort="sort"
-    :take="take"
-    :skip="skip"
-    >
-  </grid>
+            <div id ="printable-content">
+              <h2>Facturation </h2>
+              <grid
+                @pagechange="pageChangeHandler"
+                :total ="facturationList?.length"
+                :data-items="(facturationList as any)"
+                :columns="columnsFacturation"
+                :edit-field="'inEdit'"
+                :filter="filter"
+                @filterchange="filterChange"
+                :loader="loader"
+                :column-menu="true"
+                :pageable="gridPageable"
+                :sortable="sortable"
+                :sort="sort"
+                :take="take"
+                :skip="skip"
+                >
+              </grid>
+
+            </div>
+
 </template>
