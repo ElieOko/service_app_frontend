@@ -61,7 +61,7 @@ import 'vue3-toastify/dist/index.css';
     <main class="h-full pb-16 overflow-y-auto">
                 <div class="container px-6 mx-auto grid">
                     <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">
-                        Ajout Article
+                        Ajouter Marchandise en Stock
                     </h2> 
                     <form  @submit.prevent="submit_new_article" class="w-full max-w-full p-4 z-10 py-4 bg-white shadow-md dark:bg-gray-800">
                         <div class="flex flex-wrap -mx-3 mb-6">
@@ -95,66 +95,10 @@ import 'vue3-toastify/dist/index.css';
                             </div>
                         </div>
                         <div class="w-full md:w-1/2 mt-6 px-3">
-                            <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-1 focus:ring-blue-300 font-medium rounded-lg text-sm px-6 py-3 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Eregistrer</button>
+                            <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-1 focus:ring-blue-300 font-medium rounded-lg text-sm px-6 py-3 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Ajouter</button>
                         </div>
 
                     </form>
-
-                    <div class="container grid px-6 mx-auto">
-                        <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">
-                            Article Récemment Ajouter
-                        </h2>
-                        <!-- CTA -->
-
-
-                        <!-- With avatar -->
-
-                        <div class="w-full mb-8 overflow-hidden rounded-lg shadow-xs">
-                            <div class="w-full overflow-x-auto">
-                                <table class="w-full whitespace-no-wrap">
-                                    <thead>
-                                        <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
-                                            <th class="px-4 py-3">Nom de l'article</th>
-                                            <th class="px-4 py-3">Prix Unitaire</th>
-                                            <th class="px-4 py-3">Status</th>
-                                            <th class="px-4 py-3">Date</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
-                                        <tr class="text-gray-700 dark:text-gray-400">
-                                            <td class="px-4 py-3">
-                                                <div class="flex items-center text-sm">
-                                                    <!-- Avatar with inset shadow -->
-
-                                                    <div>
-                                                        <p class="font-semibold">Hans Burger</p>
-
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="px-4 py-3 text-sm">
-                                                $ 863.45
-                                            </td>
-                                            <td class="px-4 py-3 text-xs">
-                                                <span class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full dark:bg-green-700 dark:text-green-100">
-                                    En Stock
-                                  </span>
-                                            </td>
-                                            <td class="px-4 py-3 text-sm">
-                                                6/10/2023
-                                            </td>
-                                        </tr>
-
-
-
-
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-
-                    </div>
 
 
                 </div>

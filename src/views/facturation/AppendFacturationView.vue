@@ -141,7 +141,7 @@ const submit_facturation = async ()=>{
                    <div class="relative flex">
                         <div>
                             <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">
-                                Sortie en stock Facturation
+                               Facturation
                             </h2>
                         </div>
                         <div class="absolute right-0">
