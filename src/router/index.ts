@@ -14,6 +14,8 @@ import ArticleView from '../views/article/ArticleView.vue'
 //@ts-ignore
 import AppendFacturationView from '../views/facturation/AppendFacturationView.vue'
 //@ts-ignore
+import DetteView from '../views/dette/DetteView.vue'
+//@ts-ignore
 import FacturationView from '../views/facturation/FacturationView.vue'
 //@ts-ignore
 import AppendStockView from '../views/stock/AppendStockView.vue'
@@ -62,6 +64,12 @@ const routes : RouteRecordRaw[] =  [
       path: '/article',
       name: 'article',
       component: ArticleView,
+      meta:{ requiresAuth: true , reload: true}
+    },
+    {
+      path: '/dette',
+      name: 'dette',
+      component: DetteView,
       meta:{ requiresAuth: true , reload: true}
     },
     {
