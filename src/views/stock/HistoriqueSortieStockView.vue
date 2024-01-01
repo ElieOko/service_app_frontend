@@ -7,8 +7,11 @@ import { useAxiosRequestWithToken } from '@/utils/service/api';
 import { process, filterBy, type CompositeFilterDescriptor, type SortDescriptor } from '@progress/kendo-data-query';
 import { Grid, GridToolbar } from '@progress/kendo-vue-grid';
 import { ref, watchEffect } from 'vue';
+import { Loader } from '@progress/kendo-vue-indicators'
 
-const loader       = ref<Boolean>(false)
+const loader    = ref<Boolean>(false)
+const show      = ref<Boolean>(true)
+const type      = "infinite-spinner"
 const gridPageable = {
         buttonCount: 5,
         info: true,
@@ -56,6 +59,7 @@ watchEffect(async()=>{
             })
             .finally(function () {
                 //alert("Elie Oko");
+                show.value = false;
             }));
     })
   
@@ -81,4 +85,10 @@ watchEffect(async()=>{
     :skip="skip"
     >
   </grid>
+  <div v-if="show" class="k-loader-container k-loader-container-md k-loader-top">
+      <div class="k-loader-container-overlay k-overlay-dark" />
+      <div class="k-loader-container-inner">
+        <Loader :size="'large'" :type="type" />
+      </div>
+    </div>
 </template>

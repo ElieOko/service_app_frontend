@@ -1,11 +1,10 @@
 export const columnsStock = [
     { field: 'id',title:"N",editable: false},
-    { field:'article.nom',title:"Nom Article",filter:'text',editable: false},
-    { field:"article.prixUnitaire",title:"Prix Unitaire",filter: "numeric",editor:false},                  
+    { field:'article.nom',title:"Nom Article",filter:'text',editable: false},                 
     { field:"quantiteEntree", title : "Quantité Entrée", editable: false,filter:'text',editor: false}, 
-    // { field:"type", title : "Recipient", editable: false,filter:'text',editor: false},
+    { field:"contenant", title : "Recipient", editable: false,filter:'text',editor: false},
     { field:"quantiteSortie",title:"Quantité Sortie",editable: false},
-    // { field:"dateEntree", title:"Date des Entrées récents",filter: "date",editable: false},
+    { field:"date_creation", title:"Date des Entrées récents",filter: "date",editable: false},
     // { field:"dateSortie", title:"Date de Sortie récents",filter: "date",editable: false}
 ];
 export const columnsStockEntree = [
@@ -18,10 +17,13 @@ export const columnsStockEntree = [
 
 export const columnsArticle = [
     { field: 'id',title:"N",editable: false},
-    { field:'nom',title:"Nom Article",filter:'text',editable: false},
-    { field:'prixUnitaire',title:"Prix Unitaire",filter:'number',editable: false},
-    { field:'devise.code',title:"Devise",filter:'number',editable: false},
-    { field:'created_at',title:"Date création article",filter:'date',editable: false},
+    { field:'nom',title:"Nom Article",filter:'text',editor: "text"},
+    {field:"type_article.nom",title:"Type Article",filter:'text',editable: false},
+    { field:'prixUnitaire',title:"Prix de Vente D(fc)",filter:'number',editable: false},
+    { field:'price_usd_short',title:"Prix de Vente D($)",filter:'number',editable: true,editor: "text"},
+    { field:'price_big',title:"Prix de Vente G(fc)",filter:'number',editable: false},
+    { field:'price_usd_big',title:"Prix de Vente G($)",filter:'number',editable: true,editor: "text"},
+   
 ];
 
 
@@ -43,6 +45,13 @@ export const columnsFacturation = [
     { field:'prixTotal',title:"Prix Total",filter:'number',editable: false},
     { field:'created_at',title:"Date de création",filter:'date',editable: false},
 ];
+
+export const columnsMarketeur = [
+    { field: 'id',title:"N",editable: false},
+    { field:'nom',title:"Nom Complet Marketeur",filter:'text',editable: false},
+    { field:'action',title:"Action",filter:'text',editable: false},
+];
+
 
 // id          : number
 // code        : string

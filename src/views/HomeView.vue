@@ -4,10 +4,14 @@ import type { IDevise } from '@/utils/interface/IDevise';
 import type { IStock } from '@/utils/interface/IStock';
 import { useAxiosRequestWithToken } from '@/utils/service/api';
 import { ref, watchEffect } from 'vue';
+import { Loader } from '@progress/kendo-vue-indicators'
 
 const totalQteSortie = ref<number>(0)
 const totalQteEntrer = ref<number>(0)
 const totalQteAll    = ref<number>(0)
+const type = "infinite-spinner"
+const loader       = ref<Boolean>(false)
+const show       = ref<any>(true)
 const devise = ref<Array<IDevise>>([])
 const stock = ref<Array<IStock>>()
   watchEffect(async()=>{
@@ -26,6 +30,7 @@ const stock = ref<Array<IStock>>()
             })
             .finally(function () {
                 //alert("Elie Oko");
+                show.value = false
             }));
     })  
     watchEffect(async()=>{
@@ -183,4 +188,10 @@ const stock = ref<Array<IStock>>()
     </section>
   </div>
 </main>
+    <div v-if="show" class="k-loader-container k-loader-container-md k-loader-top">
+      <div class="k-loader-container-overlay k-overlay-dark" />
+      <div class="k-loader-container-inner">
+        <Loader :size="'large'" :type="type" />
+      </div>
+    </div>
 </template>

@@ -22,6 +22,12 @@ import AppendStockView from '../views/stock/AppendStockView.vue'
 //@ts-ignore
 import StockView from '../views/stock/StockView.vue'
 //@ts-ignore
+import MarketeurView from '../views/marketeur/MarketeurView.vue'
+//@ts-ignore
+import AppendMarketeurView from '../views/marketeur/AppendMarketeurView.vue'
+//@ts-ignore
+import DetailMarketeurView from '../views/marketeur/DetailMarketeurView.vue'
+//@ts-ignore
 import HistoriqueEntreeStockView from '../views/stock/HistoriqueEntreeStockView.vue'
 //@ts-ignore
 import HistoriqueSortieStockView from '../views/stock/HistoriqueSortieStockView.vue'
@@ -89,6 +95,24 @@ const routes : RouteRecordRaw[] =  [
       path: '/taux',
       name: 'taux',
       component: AppendTauxView,
+      meta:{ requiresAuth: true , reload: true}
+    },
+    {
+      path: '/marketeur',
+      name: 'marketeur',
+      component:MarketeurView,
+      meta:{ requiresAuth: true , reload: true}
+    },
+    {
+      path: '/marketeur/add',
+      name: 'marketeur_add',
+      component: AppendMarketeurView,
+      meta:{ requiresAuth: true , reload: true}
+    },
+    {
+      path: '/marketeur/detail',
+      name: 'marketeur_detail',
+      component: DetailMarketeurView,
       meta:{ requiresAuth: true , reload: true}
     },
     {

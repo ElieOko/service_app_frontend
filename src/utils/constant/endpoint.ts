@@ -1,6 +1,7 @@
 export const ApiRoutes  = {
     ArticleList                 : "article/all",
     ArticleCreate               : "article",
+    ArticleEdit                 : "article/update",
     CodeGenerate                : "code/generate",
     CodeList                    : "code/all",
     DeviseList                  : "devise/all", 
@@ -10,6 +11,10 @@ export const ApiRoutes  = {
     RegisterUser                : "register",
     facturationList             : "facturation/all",
     facturationCreate           : "facturation",
+    MarketeurCreate             : "marketeur",
+    MarketeurList               : "marketeur/all",
+    TypeVenteList               : "type/vente/all",
+    TypeArticleList             : "type/article/all",
     StockList                   : "stock/all",
     StockCreate                 : "stock",
     StockHistoriqueEntreeList   : "stock/historique/entree",

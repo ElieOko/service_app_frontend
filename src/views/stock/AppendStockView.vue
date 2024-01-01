@@ -10,10 +10,11 @@ import 'vue3-toastify/dist/index.css';
 
 const stock = ref<IStockRequest>({
   article_fk:0,
-  quantiteEntree :0
-
+  quantiteEntree :0,
+  contenant : ""
 })
 const showLoad = ref<boolean>(false)
+const tab = ["Cartons","Sac", "Autres"];
 const article = ref<Array<IArticle>>([])
   const notify = (msg:string) => {
       toast(msg, {
@@ -35,7 +36,7 @@ watchEffect(async()=>{
     const submit_stock = async ()=>{
         showLoad.value = true
         const data = (JSON.parse(JSON.stringify(stock.value))) as IStockRequest ;
-        if( data.article_fk == 0 || data.quantiteEntree == 0 ){
+        if( data.article_fk == 0 || data.quantiteEntree == 0  || data.contenant == ""){
             notify("Certains champs sont vide");
             return
         }
@@ -78,6 +79,20 @@ watchEffect(async()=>{
                           Quantité
                         </label>
                                 <input v-model="stock.quantiteEntree" class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-zip" type="number" placeholder="90210">
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap -mx-3 mb-2">
+                          <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-state">
+                                    Contenant
+                                </label>
+                                <div class="relative">
+                                    <select v-model="stock.contenant" class="block appearance-none w-full border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-state">
+                                      <option v-for="item in tab" :value ="item">{{ item }}</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Ajouter au stock <svg v-if="showLoad" class="spinner inline h-6 w-6 mr-3" viewBox="0 0 4 4"></svg></button>

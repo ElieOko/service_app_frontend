@@ -7,9 +7,19 @@ import { useAxiosRequestWithToken } from '@/utils/service/api';
 import { process, filterBy, type CompositeFilterDescriptor, type SortDescriptor } from '@progress/kendo-data-query';
 import { Grid, GridToolbar } from '@progress/kendo-vue-grid';
 import { ref, watchEffect } from 'vue';
+import { Loader } from '@progress/kendo-vue-indicators'
+import { saveExcel } from '@progress/kendo-vue-excel-export';
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
 
 const article = ref<Array<IArticle>>([])
+const editField = ref<any>()
+const type = "infinite-spinner"
 const loader       = ref<Boolean>(false)
+const show       = ref<any>(false)
+// const  toggleLoader = () => {
+    show.value = show.value ? false : 'loader';
+    // }
 const gridPageable = {
         buttonCount: 5,
         info: true,
@@ -23,6 +33,31 @@ const gridPageable = {
   const sort = ref<SortDescriptor[] | undefined>([
       { field: "id", dir: "asc" }
     ]);
+    const cellClick = (e: any) => {
+      if (e.dataItem.inEdit && e.field === editField.value) {
+        return;
+      }
+      exitEdit(e.dataItem, true);
+      editField.value = e.field;
+      e.dataItem.inEdit = e.field;
+    }
+    const exitEdit =  (dataItem:any, exitEdit:any) => {
+      if (!exitEdit && dataItem.inEdit) {
+        return;
+      }
+      article.value.forEach((d:any) => {
+        if (d.inEdit) {
+          d.inEdit = undefined;
+        }
+      });
+      editField.value = undefined;
+    }
+    const itemChange =  (e:any)=> {
+            const data =  article.value.slice();
+            const index = data.findIndex((d  => d.id === e.dataItem.id ))
+            data[index] = { ...data[index], [e.field]: e.value };
+            article.value  = data;
+        }
   const filter = ref<CompositeFilterDescriptor>({logic: "and", filters: []});
     const pageChangeHandler = (event:any) => {
       loader.value = true;
@@ -41,6 +76,7 @@ const gridPageable = {
         loader.value = false;
       }, 300);
     } 
+   const fetchAllData = ()=>{
     watchEffect(async()=>{
         await(useAxiosRequestWithToken().get(`${ApiRoutes.ArticleList}`)
             .then(function (response) {
@@ -54,10 +90,48 @@ const gridPageable = {
             })
             .finally(function () {
                 //alert("Elie Oko");
+                show.value = false
             }));
     })
-
-
+   }
+   fetchAllData()
+    const dataUpdate = ()=>{
+      loader.value = true
+      article.value.map(async (art,key)=>{
+        const data = JSON.parse(JSON.stringify(art));
+        await(useAxiosRequestWithToken().post(`${ApiRoutes.ArticleEdit}/${art.id}`,data)
+            .then(function (response) {
+              console.log(response);
+              if(article.value.length - 1 == key){
+                fetchAllData()
+                loader.value = false
+              }
+              
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+            .finally(function () {
+            }));
+      })
+    }
+    const notify = (msg:string) => {
+      toast(msg, {
+        autoClose: 8000,
+      });
+      }
+    const exportExcelFile =()=>{
+      let msg = "Aucune donnée chargée..."
+      if(article.value.length > 0){
+         msg = "Téléchargement Effectué avec succès !"
+        saveExcel({
+                data: article.value,
+                fileName: "Marchandise",
+                columns: columnsArticle
+            })
+      }
+      notify(msg)
+    }
 </script>
 <template>
   <div class="flex flex-wrap -mx-6">
@@ -92,7 +166,20 @@ const gridPageable = {
           </div>
       </router-link>
     </div>
+  </div>
+  <div class="flex flex-wrap -mx-2">
+    <div class=" ">
+      <button type="button" @click="dataUpdate" class="text-white mt-5 bg-gray-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+        Sauvegarder les Modifications<svg v-if="loader" class="spinner inline h-6 w-6 mr-3" viewBox="0 0 4 4"></svg>
+      </button>
+    </div>
+    <div class="">
+      <button type="button" @click="exportExcelFile" class="text-white mt-5 bg-gray-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+        Exportation
+      </button>
+    </div>
   </div>  
+
   <div class="mt-8" />
   <grid
     @pagechange="pageChangeHandler"
@@ -100,9 +187,11 @@ const gridPageable = {
     :data-items="article"
     :columns="columnsArticle as any"
     :edit-field="'inEdit'"
+    @cellclick="cellClick"
+    @itemchange="itemChange"
     :filter="filter"
     @filterchange="filterChange"
-    :loader="loader"
+    :loader="show"
     :column-menu="true"
     :pageable="gridPageable"
     :sortable="sortable"
@@ -111,4 +200,23 @@ const gridPageable = {
     :skip="skip"
     >
   </grid>
+    <div v-if="show" class="k-loader-container k-loader-container-md k-loader-top">
+      <div class="k-loader-container-overlay k-overlay-dark" />
+      <div class="k-loader-container-inner">
+        <Loader :size="'large'" :type="type" />
+      </div>
+    </div>
 </template>
+<style>
+  .spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #25353f;
+  border-radius: 50%;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
