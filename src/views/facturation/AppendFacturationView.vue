@@ -3,6 +3,7 @@ import { ApiRoutes } from '@/utils/constant/endpoint';
 import type { ICodeFacture } from '@/utils/interface/ICodeFacture';
 import type { IFacturation, IFacturationRequest } from '@/utils/interface/IFacturation';
 import type { IStock } from '@/utils/interface/IStock';
+import type { ITypeVente } from '@/utils/interface/ITypeVente';
 import { useAxiosRequestWithToken } from '@/utils/service/api';
 import { process, filterBy, type CompositeFilterDescriptor, type SortDescriptor } from '@progress/kendo-data-query';
 import { Grid, GridToolbar } from '@progress/kendo-vue-grid';
@@ -20,9 +21,10 @@ const columnsFacturation = [
     { field:'created_at',title:"Date de création",filter:'date',editable: false},
 ];
 const facturation = ref<IFacturationRequest>({
-    stock_fk : 0,
-    quantite : 0,
-    code_fk  : 0,
+    stock_fk      : 0,
+    quantite      : 0,
+    code_fk       : 0,
+    type_vente_fk : 0
 })
 const totalPrice = ref<number>(0)
 const qte  = ref<number>(0)
@@ -82,7 +84,6 @@ const stock = ref<Array<IStock>>()
             .then(function (response) {
               stock.value = response.data.stocks as Array<IStock>
               console.log( stock.value);
-            
             })
             .catch(function (error) {
                 console.log(error);
@@ -137,6 +138,70 @@ const submit_facturation = async ()=>{
   }
 
 }
+/*
+<div id ="printable-content" class="p-4 bg-white border rounded-lg shadow-lg px-4 py-4 max-w-xl mx-auto mt-8">
+    <h1 class="font-bold text-2xl my-4 text-center text-blue-600">Drapeau ya Mboka</h1>
+    <hr class="mb-2">
+    <div class="flex justify-between mb-6">
+        <h1 class="text-lg font-bold">Bon de commande</h1>
+        <div class="text-gray-700">
+            <div>Date: 01/05/2023</div>
+            <div>Facture #: {{ "INV12345" }}</div>
+        </div>
+    </div>
+    <div class="mb-8">
+        <h2 class="text-lg font-bold">Adresse :</h2>
+        <div class="text-gray-700 mb-2">Bokasa Olela</div>
+        <div class="text-gray-700 mb-2">N° 6</div>
+        <div class="text-gray-700 font-bold mb-2">Marketeur</div>
+        <div class="text-gray-700">{{ "Osée" }}</div>
+    </div>
+    <table class="w-full mb-8">
+        <thead>
+            <tr>
+                <th class="text-left font-bold text-gray-700">Marchandise</th>
+                <th class="text-right font-bold text-gray-700">Quantité</th>
+                <th class="text-right font-bold text-gray-700">Prix Unitaire</th>
+                <th class="text-right font-bold text-gray-700">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="item in facturationList">
+                <td class="text-left text-gray-700">{{ item.stocks.article.nom }}</td>
+                <td class="text-right text-gray-700">{{ item.quantite }}</td>
+                <td class="text-right text-gray-700">{{ item.type_vente.id == 2 ? item.stocks.article.prixUnitaire : item.stocks.article.price_big }}</td>
+                <td class="text-right text-gray-700">{{ item.quantite * item.type_vente.id == 2 ? item.stocks.article.prixUnitaire : item.stocks.article.price_big  }}</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+
+                <td class="text-left font-bold text-gray-700">Total</td>
+                <td class="text-right font-bold text-gray-700"></td>
+                <td class="text-right font-bold text-gray-700"></td>
+                <td class="text-right font-bold text-gray-700">{{ "0" }}</td>
+            </tr>
+        </tfoot>
+    </table>
+    <!-- <div class="text-gray-700 mb-2">Thank you for your business!</div> -->
+
+</div> 
+*/
+const type_vente = ref<Array<ITypeVente>>([])
+const type_v = async () =>{
+    await(useAxiosRequestWithToken().get(`${ApiRoutes.TypeVenteList}`)
+            .then(function (response) {
+                type_vente.value = response.data.type_ventes as Array<ITypeVente>
+                console.log( type_vente.value);
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+            .finally(function () {
+                //alert("Elie Oko");
+    }));
+}
+type_v()
 </script>
 <template>
       <main class="h-full pb-16 overflow-y-auto">
@@ -151,7 +216,7 @@ const submit_facturation = async ()=>{
                             <button @click="generate_code" type="button" class="text-white mt-5 bg-gray-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Generer un code</button>
                         </div>
                    </div>
-                    <form class="w-full"  @submit.prevent="submit_facturation">
+                    <form class="w-full max-w-full p-4 z-10 py-4 bg-white shadow-md "  @submit.prevent="submit_facturation">
                         <div class="flex flex-wrap -mx-3 mb-2">
                           <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
                                 <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-state">
@@ -172,7 +237,9 @@ const submit_facturation = async ()=>{
                                 <input v-model="facturation.quantite" class="appearance-none block w-full text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-zip" type="number" placeholder="90210">
                             </div>
                         </div>
-                        <div class="w-full md:w-1/2 mb-6 md:mb-0">
+                        
+                        <div class="flex flex-wrap -mx-3 mb-2">
+                          <div class="w-full px-3 md:w-1/2 mb-6 md:mb-0">
                                 <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-state">
                                     Code Facturation
                                 </label>
@@ -183,7 +250,21 @@ const submit_facturation = async ()=>{
                                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                                     </div>
                                 </div>
-                            </div>
+                          </div>
+                          <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+                                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="grid-state">
+                                    Type de vente
+                                </label>
+                                <div class="relative">
+                                    <select v-model="facturation.type_vente_fk" class="block appearance-none w-full border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-state">
+                                      <option v-for="item in type_vente"  :value ="item.id">{{ item.nom }}</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                    </div>
+                                </div>
+                          </div>
+                        </div>
+                        
                         <button type="submit" class="text-white mt-5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Sortir au stock <svg v-if="showLoad" class="spinner inline h-6 w-6 mr-3" viewBox="0 0 4 4"></svg></button>
                         <button @click="printer" type="button" class="text-white mt-5 bg-gray-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Imprimer</button>
                     </form>
@@ -205,44 +286,17 @@ const submit_facturation = async ()=>{
                 @filterchange="filterChange"
                 :loader="loader">
               </grid>
-                    
                     <div class="w-full overflow-hidden rounded-lg shadow-xs">
                         <div class="w-full overflow-x-auto">
-            <!-- <table class="w-full whitespace-no-wrap">
-                                <thead>
-                                    <tr class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b dark:border-gray-700 bg-gray-50 dark:text-gray-400 dark:bg-gray-800">
-                                        <th class="px-4 py-3">Marchandise</th>
-                                        <th class="px-4 py-3">Quantité</th>
-                                        <th class="px-4 py-3">Prix Unitaire</th>
-                                        <th class="px-4 py-3">Prix total</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y dark:divide-gray-700 dark:bg-gray-800">
-                                    <tr v-for="item in facturationList" class="text-gray-700 dark:text-gray-400">
-                                        <td class="px-4 py-3 text-sm">
-                                            {{item.stocks.article.nom }}
-                                        </td>
-                                        <td class="px-4 py-3 text-sm">
-                                            {{ item.quantite }}
-                                        </td>
-                                        <td class="px-4 py-3 text-sm">
-                                          {{ item.stocks.article.prixUnitaire }}
-                                        </td>
-                                        <td class="px-4 py-3 text-sm">
-                                            {{item.prixTotal }}
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table> -->
                           <div class="grid px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase border-t dark:border-gray-700 bg-gray-50 sm:grid-cols-9 dark:text-gray-400 dark:bg-gray-800">
                             <span class="flex items-center col-span-3">
-                           
                             </span>
                           </div>
                         </div>
                       </div>
                     </div>
                     </main>
+                         
 </template>
 <style>
   .spinner {

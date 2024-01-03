@@ -157,7 +157,7 @@ type_article_fk: 0
 
 
                 </div>
-            </main>
+    </main>
 </template>
 <style>
   .spinner {

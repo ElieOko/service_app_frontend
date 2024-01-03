@@ -23,10 +23,10 @@ export interface IDette{
     type_ventes         : ITypeVente;
     marketeurs          : IMarketeur;
     stocks              : IStock 
+
 }
 
 export interface IDetteRequest{
-    id                  : number;
     code_fk             : number;
     stock_fk            : number;
     marketeur_fk        : number;

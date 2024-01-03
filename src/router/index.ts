@@ -16,6 +16,8 @@ import AppendFacturationView from '../views/facturation/AppendFacturationView.vu
 //@ts-ignore
 import DetteView from '../views/dette/DetteView.vue'
 //@ts-ignore
+import AppendDetteView from '../views/dette/AppendDetteView.vue'
+//@ts-ignore
 import FacturationView from '../views/facturation/FacturationView.vue'
 //@ts-ignore
 import AppendStockView from '../views/stock/AppendStockView.vue'
@@ -76,6 +78,12 @@ const routes : RouteRecordRaw[] =  [
       path: '/dette',
       name: 'dette',
       component: DetteView,
+      meta:{ requiresAuth: true , reload: true}
+    },
+    {
+      path: '/dette/add',
+      name: 'dette_add',
+      component: AppendDetteView,
       meta:{ requiresAuth: true , reload: true}
     },
     {
