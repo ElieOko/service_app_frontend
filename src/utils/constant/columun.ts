@@ -54,6 +54,7 @@ id                  : number;
 export const columnsDette = [
     { field: 'id',title:"N",editable: false,width: '90px',resizable: false},
     { field:'marketeur.nom',title:"Marketeur",filter:'text',editor: "text",resizable: false,width: '120px',},
+    { field:'date_creation',title:"Date Création",filter:'text',editable: false,editor: "text",width: '190px',resizable: false},
     { field:'stock.article.nom',title:"Marchandise",filter:'number',editable: false,width: '120px',resizable: false},
     {title:'Quantité',
     children: [
@@ -66,16 +67,15 @@ export const columnsDette = [
     children: [
         {field:"montant_final",title:"Montant à payer",filter:'number',editable: false,width: '158px',resizable: false},
         {field:"montant_restant",title:"Montant restant",filter:'number',editable: false,width: '158px',resizable: false},
-        {field:"montant_payer",title:"Montant versé",filter:'number',editable: false,width: '158px',resizable: false},
+        {field:"montant_payer",title:"Montant versé",filter:'number',editable: true,width: '158px',resizable: false},
     ]
     },
     {title:"Autres",
     children: [
-    {field:"type_ventes.nom",title:"Type de vente",filter:'text',editable: true,editor: "text",width: '120px',resizable: false},
-    { field:'status',title:"Status",filter:'text',editable: true,editor: "text",width: '100px',resizable: false},
+    {field:"type_vente.nom",title:"Type de vente",filter:'text',editable: false,editor: "text",width: '120px',resizable: false},
+    { field:'status.nom',title:"Status",filter:'text',editable: false,editor: "text",width: '100px',resizable: false},
     { field:'note',title:"Note",filter:'text',editable: true,editor: "text",width: '190px',resizable: false},
-    { field:'observation',title:"Observation",filter:'text',editable: true,editor: "text",width: '190px',resizable: false},
-    { field:'date_creation',title:"Date Création",filter:'text',editable: true,editor: "text",width: '190px',resizable: false}
+    { field:'observation',title:"Observation",filter:'text',editable: true,editor: "text",width: '190px',resizable: false}
     ]},
 ];// 
 

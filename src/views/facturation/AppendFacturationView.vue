@@ -24,7 +24,8 @@ const facturation = ref<IFacturationRequest>({
     stock_fk      : 0,
     quantite      : 0,
     code_fk       : 0,
-    type_vente_fk : 0
+    type_vente_fk : 0,
+    client        :""
 })
 const totalPrice = ref<number>(0)
 const qte  = ref<number>(0)
@@ -77,6 +78,7 @@ const notify = (msg:string) => {
       });
 }
 const code = ref<ICodeFacture>()
+const date_in = ref<string>("")
 // const 
 const stock = ref<Array<IStock>>()
     watchEffect(async()=>{
@@ -122,8 +124,7 @@ const submit_facturation = async ()=>{
                     facturationList.value = response.data.facturation as Array<IFacturation>
                     console.log("test", facturationList) 
                     facturationList.value.map((v:IFacturation,k:number)=>{
-                      mr.value = v.codes.nom
-                      totalPrice.value += v.prixTotal
+                      totalPrice.value += v.quantite * ( v.type_vente_fk == 2 ? v.stock.article.prixUnitaire as any as number : v.stock.article.price_big as any as number )
                       qte.value += v.quantite
                     })
                 }
@@ -136,56 +137,9 @@ const submit_facturation = async ()=>{
                 showLoad.value = false
             }));
   }
-
-}
+}                   
 /*
-<div id ="printable-content" class="p-4 bg-white border rounded-lg shadow-lg px-4 py-4 max-w-xl mx-auto mt-8">
-    <h1 class="font-bold text-2xl my-4 text-center text-blue-600">Drapeau ya Mboka</h1>
-    <hr class="mb-2">
-    <div class="flex justify-between mb-6">
-        <h1 class="text-lg font-bold">Bon de commande</h1>
-        <div class="text-gray-700">
-            <div>Date: 01/05/2023</div>
-            <div>Facture #: {{ "INV12345" }}</div>
-        </div>
-    </div>
-    <div class="mb-8">
-        <h2 class="text-lg font-bold">Adresse :</h2>
-        <div class="text-gray-700 mb-2">Bokasa Olela</div>
-        <div class="text-gray-700 mb-2">N° 6</div>
-        <div class="text-gray-700 font-bold mb-2">Marketeur</div>
-        <div class="text-gray-700">{{ "Osée" }}</div>
-    </div>
-    <table class="w-full mb-8">
-        <thead>
-            <tr>
-                <th class="text-left font-bold text-gray-700">Marchandise</th>
-                <th class="text-right font-bold text-gray-700">Quantité</th>
-                <th class="text-right font-bold text-gray-700">Prix Unitaire</th>
-                <th class="text-right font-bold text-gray-700">Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="item in facturationList">
-                <td class="text-left text-gray-700">{{ item.stocks.article.nom }}</td>
-                <td class="text-right text-gray-700">{{ item.quantite }}</td>
-                <td class="text-right text-gray-700">{{ item.type_vente.id == 2 ? item.stocks.article.prixUnitaire : item.stocks.article.price_big }}</td>
-                <td class="text-right text-gray-700">{{ item.quantite * item.type_vente.id == 2 ? item.stocks.article.prixUnitaire : item.stocks.article.price_big  }}</td>
-            </tr>
-        </tbody>
-        <tfoot>
-            <tr>
 
-                <td class="text-left font-bold text-gray-700">Total</td>
-                <td class="text-right font-bold text-gray-700"></td>
-                <td class="text-right font-bold text-gray-700"></td>
-                <td class="text-right font-bold text-gray-700">{{ "0" }}</td>
-            </tr>
-        </tfoot>
-    </table>
-    <!-- <div class="text-gray-700 mb-2">Thank you for your business!</div> -->
-
-</div> 
 */
 const type_vente = ref<Array<ITypeVente>>([])
 const type_v = async () =>{
@@ -271,6 +225,52 @@ type_v()
                 </div>
             </main>
             <div class="mt-8" />
+            <div id ="printable-content" class="p-4 bg-white border rounded-lg shadow-lg px-4 py-4 max-w-xl mx-auto mt-8">
+    <h1 class="font-bold text-2xl my-4 text-center text-blue-600">Drapeau ya Mboka</h1>
+    <hr class="mb-2">
+    <div class="flex justify-between mb-6">
+        <h1 class="text-lg font-bold">Facturation</h1>
+        <div class="text-gray-700">
+            <div>Facture n#: {{ code?.nom }}</div>
+        </div>
+    </div>
+    <div class="mb-8">
+        <h2 class="text-lg font-bold">Adresse :</h2>
+        <div class="text-gray-700 mb-2">Bokasa Olela</div>
+        <div class="text-gray-700 mb-2">N° 6</div>
+        <div class="text-gray-700 font-bold mb-2">Client</div>
+        <div class="text-gray-700">{{ "" }}</div>
+    </div>
+    <table class="w-full mb-8">
+        <thead>
+            <tr>
+                <th class="text-left font-bold text-gray-700">Marchandise</th>
+                <th class="text-right font-bold text-gray-700">Quantité</th>
+                <th class="text-right font-bold text-gray-700">Prix Unitaire</th>
+                <th class="text-right font-bold text-gray-700">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="item in facturationList">
+                <td class="text-left text-gray-700">{{ item.stock.article.nom }}</td>
+                <td class="text-right text-gray-700">{{ item.quantite }}</td>
+                <td class="text-right text-gray-700">{{ item.type_vente_fk == 2 ? item.stock.article.prixUnitaire : item.stock.article.price_big }}</td>
+                <td class="text-right text-gray-700">{{ item.quantite * ( item.type_vente_fk == 2 ? item?.stock.article.prixUnitaire as any as number : item?.stock?.article?.price_big as any as number ) }}</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td class="text-left font-bold text-gray-700">Total</td>
+                <td class="text-right font-bold text-gray-700"></td>
+                <td class="text-right font-bold text-gray-700"></td>
+                <td class="text-right font-bold text-gray-700">{{totalPrice}}fc</td>
+            </tr>
+            
+        </tfoot>
+    </table>
+    <!-- <div class="text-gray-700 mb-2">Thank you for your business!</div> -->
+
+</div> 
             <main>
             <div id ="printable-content">
               <h4 class="mb-4 text-lg font-semibold text-gray-600 dark:text-gray-300">

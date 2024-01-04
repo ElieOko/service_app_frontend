@@ -1,5 +1,6 @@
 import type { ICodeFacture } from "./ICodeFacture";
 import type { IMarketeur } from "./IMarketeur";
+import type { IStatus } from "./IStatus";
 import type { IStock } from "./IStock";
 import type { ITypeVente } from "./ITypeVente";
 
@@ -21,8 +22,9 @@ export interface IDette{
     date_creation       : string;
     code                : ICodeFacture;
     type_ventes         : ITypeVente;
-    marketeurs          : IMarketeur;
-    stocks              : IStock 
+    marketeur           : IMarketeur;
+    stock               : IStock ;
+    status              : IStatus
 
 }
 

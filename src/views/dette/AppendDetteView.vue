@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ApiRoutes } from '@/utils/constant/endpoint';
 import type { ICodeFacture } from '@/utils/interface/ICodeFacture';
-import type { IDetteRequest } from '@/utils/interface/IDette';
+import type { IDette, IDetteRequest } from '@/utils/interface/IDette';
 import type { IFacturation, IFacturationRequest } from '@/utils/interface/IFacturation';
 import type { IMarketeur } from '@/utils/interface/IMarketeur';
 import type { IStock } from '@/utils/interface/IStock';
@@ -13,29 +13,6 @@ import { ref, watchEffect } from 'vue';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 
-const columnsFacturation = [
-    { field: 'id',title:"N",editable: false},
-    { field:'code.nom',title:"Code Facturation",filter:'text',editable: false},
-    { field:'stock.article.nom',title:"Marchandise",filter:'number',editable: false},
-    { field:'quantite',title:"Quantité",filter:'number',editable: false},
-    { field:'stock.article.prixUnitaire',title:"Prix Unitaire",filter:'number',editable: false},
-    { field:'prixTotal',title:"Prix Total",filter:'number',editable: false},
-    { field:'created_at',title:"Date de création",filter:'date',editable: false},
-];
-const facturation = ref<IFacturationRequest>({
-    stock_fk : 0,
-    quantite : 0,
-    code_fk  : 0,
-    type_vente_fk : 0
-})
-/*
-    stock_fk            : number;
-    marketeur_fk        : number;
-    type_vente_fk       : number;
-    quantite_emprunter  : number;
-    note ?              : string;
-    observation?        : string;
-*/
 const dette = ref<IDetteRequest>({
     code_fk: 0,
     marketeur_fk: 0,
@@ -45,6 +22,7 @@ const dette = ref<IDetteRequest>({
     observation: "",
     stock_fk: 0
 })
+const dette_list = ref<Array<IDette>>([])
 const totalPrice = ref<number>(0)
 const qte  = ref<number>(0)
 const mr = ref<string>("")
@@ -52,7 +30,15 @@ const showLoad = ref<boolean>(false)
 const printer = ():Boolean =>{
         var new_str = ((document.getElementById("printable-content")) as HTMLElement).innerHTML; 
         var old_str = document.body.innerHTML; 
-        document.body.innerHTML =new_str ; 
+        document.body.innerHTML = new_str ; 
+        window.print(); 
+        document.body.innerHTML = old_str;
+        return false
+    }
+const printer2 = ():Boolean =>{
+        var new_str = ((document.getElementById("printable-content2")) as HTMLElement).innerHTML; 
+        var old_str = document.body.innerHTML; 
+        document.body.innerHTML = new_str ; 
         window.print(); 
         document.body.innerHTML = old_str;
         return false
@@ -95,6 +81,7 @@ const notify = (msg:string) => {
       });
 }
 const code = ref<ICodeFacture>()
+const nom_marketeur = ref<string>("")
 const type_vente = ref<Array<ITypeVente>>([])
 // const 
 const stock = ref<Array<IStock>>()
@@ -114,6 +101,7 @@ const stock = ref<Array<IStock>>()
     }) 
 const columnsDette = [
     { field: 'id',title:"N",editable: false,width: '90px',resizable: false},
+    { field:'date_creation',title:"Date Création",filter:'text',editable: false,editor: "text",width: '190px',resizable: false},
     { field:'marketeur.nom',title:"Marketeur",filter:'text',editor: "text",resizable: false,width: '120px',},
     { field:'stock.article.nom',title:"Marchandise",filter:'number',editable: false,width: '120px',resizable: false},
     {title:'Quantité',
@@ -132,13 +120,12 @@ const columnsDette = [
     },
     {title:"Autres",
     children: [
-    {field:"type_ventes.nom",title:"Type de vente",filter:'text',editable: true,editor: "text",width: '120px',resizable: false},
-    { field:'status',title:"Status",filter:'text',editable: true,editor: "text",width: '100px',resizable: false},
+    {field:"type_vente.nom",title:"Type de vente",filter:'text',editable: false,editor: "text",width: '120px',resizable: false},
+    { field:'status.nom',title:"Status",filter:'text',editable: false,editor: "text",width: '100px',resizable: false},
     { field:'note',title:"Note",filter:'text',editable: true,editor: "text",width: '190px',resizable: false},
     { field:'observation',title:"Observation",filter:'text',editable: true,editor: "text",width: '190px',resizable: false},
-    { field:'date_creation',title:"Date Création",filter:'text',editable: true,editor: "text",width: '190px',resizable: false}
     ]},
-];//   
+];//    
 const generate_code = async()=>{
     await(useAxiosRequestWithToken().get(`${ApiRoutes.CodeGenerate}`)
             .then(function (response) {
@@ -153,8 +140,6 @@ const generate_code = async()=>{
                 //alert("Elie Oko");
             }));
 }
-
-
 const type_v = async () =>{
     await(useAxiosRequestWithToken().get(`${ApiRoutes.TypeVenteList}`)
             .then(function (response) {
@@ -171,22 +156,23 @@ const type_v = async () =>{
 type_v()
 const submit_facturation = async ()=>{
   showLoad.value = true
-  const data = (JSON.parse(JSON.stringify(facturation.value))) as IFacturationRequest ;
-  if(data.code_fk == 0 || data.quantite == 0 || data.stock_fk == 0){
+  const data = (JSON.parse(JSON.stringify(dette.value))) as IDetteRequest ;
+  if(data.code_fk == 0 || data.quantite_emprunter == 0 || data.stock_fk == 0 || data.marketeur_fk == 0){
     notify("Entrez les informations valides");
     showLoad.value = false
   }
   else{
-    await(useAxiosRequestWithToken().post(`${ApiRoutes.facturationCreate}`,data).then(function (response) {
+    await(useAxiosRequestWithToken().post(`${ApiRoutes.DetteCreate}`,data).then(function (response) {
               console.log(response)
                 notify(response.data.message);
                 if(response.data.message == "Enregistrement réussie avec succès"){
-                    facturationList.value = response.data.facturation as Array<IFacturation>
+                    dette_list.value = response.data.dettes as Array<IDette>
                     console.log("test", facturationList) 
-                    facturationList.value.map((v:IFacturation,k:number)=>{
-                      mr.value = v.codes.nom
-                      totalPrice.value += v.prixTotal
-                      qte.value += v.quantite
+                    dette_list.value.map((v:IDette,k:number)=>{
+                    //   mr.value = v.code.nom
+                      totalPrice.value += v.montant_final
+                      nom_marketeur.value = v.marketeur.nom
+                    //   qte.value += v.quantite_emprunter
                     })
                 }
             })
@@ -194,11 +180,9 @@ const submit_facturation = async ()=>{
                notify(error)
             })
             .finally(function () {
-                //alert("Elie Oko");
                 showLoad.value = false
             }));
   }
-
 }
 const data = ref<Array<IMarketeur>>([])
 watchEffect(async()=>{
@@ -301,15 +285,15 @@ watchEffect(async()=>{
             </main>
             <div class="mt-8" />
             <main>
-            <div >
+            <div id="printable-content2">
               <h4 class="mb-4 text-lg font-semibold text-gray-600 dark:text-gray-300">
-                       Dette {{ mr }}
-                    </h4>
-                    <div class="mt-8" />
+                Dette {{ mr }}
+              </h4>
+                <div class="mt-8" />
               <grid
                 @pagechange="pageChangeHandler"
-                :total ="facturationList?.length"
-                :data-items="(facturationList as any)"
+                :total ="dette_list?.length"
+                :data-items="(dette_list as any)"
                 :columns="columnsDette"
                 :edit-field="'inEdit'"
                 @filterchange="filterChange"
@@ -325,7 +309,51 @@ watchEffect(async()=>{
                       </div>
                     </div>
                     </main>
+    <div id ="printable-content" class="p-4 bg-white border rounded-lg shadow-lg px-4 py-4 max-w-xl mx-auto mt-8">
+        <h1 class="font-bold text-2xl my-4 text-center text-blue-600">Drapeau ya Mboka</h1>
+        <hr class="mb-2">
+    <div class="flex justify-between mb-6">
+        <h1 class="text-lg font-bold">Bon de commande</h1>
+        <div class="text-gray-700">
+            <div>Numero #: {{ code?.nom }}</div>
+        </div>
+    </div>
+    <div class="mb-8">
+        <h2 class="text-lg font-bold">Adresse :</h2>
+        <div class="text-gray-700 mb-2">Bokasa Olela</div>
+        <div class="text-gray-700 mb-2">N° 6</div>
+        <div class="text-gray-700 font-bold mb-2">Marketeur</div>
+        <div class="text-gray-700">{{nom_marketeur}}</div>
+    </div>
+    <table class="w-full mb-8">
+        <thead>
+            <tr>
+                <th class="text-left font-bold text-gray-700">Marchandise</th>
+                <th class="text-right font-bold text-gray-700">Quantité</th>
+                <th class="text-right font-bold text-gray-700">Prix Unitaire</th>
+                <th class="text-right font-bold text-gray-700">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="item in dette_list">
+                <td class="text-left text-gray-700">{{ item.stock.article.nom }}</td>
+                <td class="text-right text-gray-700">{{ item.quantite_emprunter }}</td>
+                <td class="text-right text-gray-700">{{ item.type_vente_fk == 2 ? item.stock.article.prixUnitaire : item.stock.article.price_big }}</td>
+                <td class="text-right text-gray-700">{{ item.quantite_emprunter * ( item.type_vente_fk == 2 ? item?.stock.article.prixUnitaire as any as number : item?.stock?.article?.price_big as any as number ) }}</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td class="text-left font-bold text-gray-700">Total</td>
+                <td class="text-right font-bold text-gray-700"></td>
+                <td class="text-right font-bold text-gray-700"></td>
+                <td class="text-right font-bold text-gray-700">{{totalPrice}}fc</td>
+            </tr>
+        </tfoot>
+    </table>
+    <!-- <div class="text-gray-700 mb-2">Thank you for your business!</div> -->
 
+</div>
 </template>
 <style>
   .spinner {
