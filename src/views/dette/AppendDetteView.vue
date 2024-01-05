@@ -12,7 +12,12 @@ import { Grid, GridToolbar } from '@progress/kendo-vue-grid';
 import { ref, watchEffect } from 'vue';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
+import { Loader } from '@progress/kendo-vue-indicators'
 
+const type                  = "infinite-spinner"
+const show                  = ref<any>(false)
+// const  toggleLoader = () => {
+show.value = show.value ? false : 'loader';
 const dette = ref<IDetteRequest>({
     code_fk: 0,
     marketeur_fk: 0,
@@ -22,11 +27,12 @@ const dette = ref<IDetteRequest>({
     observation: "",
     stock_fk: 0
 })
-const dette_list = ref<Array<IDette>>([])
-const totalPrice = ref<number>(0)
-const qte  = ref<number>(0)
-const mr = ref<string>("")
-const showLoad = ref<boolean>(false)
+
+const dette_list            = ref<Array<IDette>>([])
+const totalPrice            = ref<number>(0)
+const qte                   = ref<number>(0)
+const mr                    = ref<string>("")
+const showLoad              = ref<boolean>(false)
 const printer = ():Boolean =>{
         var new_str = ((document.getElementById("printable-content")) as HTMLElement).innerHTML; 
         var old_str = document.body.innerHTML; 
@@ -43,6 +49,7 @@ const printer2 = ():Boolean =>{
         document.body.innerHTML = old_str;
         return false
     }
+    show.value = false
 const facturationList = ref<Array<IFacturation>>([])
 const loader       = ref<Boolean>(false)
 const gridPageable = {
@@ -162,6 +169,7 @@ const submit_facturation = async ()=>{
     showLoad.value = false
   }
   else{
+    show.value = true
     await(useAxiosRequestWithToken().post(`${ApiRoutes.DetteCreate}`,data).then(function (response) {
               console.log(response)
                 notify(response.data.message);
@@ -181,6 +189,7 @@ const submit_facturation = async ()=>{
             })
             .finally(function () {
                 showLoad.value = false
+                show.value = false
             }));
   }
 }
@@ -354,6 +363,12 @@ watchEffect(async()=>{
     <!-- <div class="text-gray-700 mb-2">Thank you for your business!</div> -->
 
 </div>
+<div v-if="show" class="k-loader-container k-loader-container-md k-loader-top">
+      <div class="k-loader-container-overlay k-overlay-dark" />
+      <div class="k-loader-container-inner">
+        <Loader :size="'large'" :type="type" />
+      </div>
+    </div>
 </template>
 <style>
   .spinner {

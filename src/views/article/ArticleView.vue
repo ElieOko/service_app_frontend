@@ -10,7 +10,9 @@ import { ref, watchEffect } from 'vue';
 import { Loader } from '@progress/kendo-vue-indicators'
 import { saveExcel } from '@progress/kendo-vue-excel-export';
 import { toast } from 'vue3-toastify';
+// import ButtonAction from '@/components/ButtonAction.vue'
 import 'vue3-toastify/dist/index.css';
+
 
 const article = ref<Array<IArticle>>([])
 const editField = ref<any>()
@@ -97,6 +99,7 @@ const gridPageable = {
    fetchAllData()
     const dataUpdate = ()=>{
       loader.value = true
+      show.value = false
       article.value.map(async (art,key)=>{
         const data = JSON.parse(JSON.stringify(art));
         await(useAxiosRequestWithToken().post(`${ApiRoutes.ArticleEdit}/${art.id}`,data)
@@ -132,6 +135,9 @@ const gridPageable = {
       }
       notify(msg)
     }
+    const action = ()=>{
+  alert("Bonjour");
+} 
 </script>
 <template>
   <div class="flex flex-wrap -mx-6">
@@ -167,6 +173,7 @@ const gridPageable = {
       </router-link>
     </div>
   </div>
+ 
   <div class="flex flex-wrap -mx-2">
     <div class=" ">
       <button type="button" @click="dataUpdate" class="text-white mt-5 bg-gray-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
@@ -199,6 +206,12 @@ const gridPageable = {
     :take="take"
     :skip="skip"
     >
+    // <template v-slot:myTemplate="{props}">
+    //         <ButtonAction  :msg="'oko'"/>
+    //     </template>
+    //     <grid-norecords>
+    //         There is no data available custom
+    //     </grid-norecords>
   </grid>
     <div v-if="show" class="k-loader-container k-loader-container-md k-loader-top">
       <div class="k-loader-container-overlay k-overlay-dark" />

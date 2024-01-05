@@ -1,10 +1,10 @@
 export const columnsStock = [
-    { field: 'id',title:"N",editable: false},
-    { field:'article.nom',title:"Nom Article",filter:'text',editable: false},                 
-    { field:"quantiteEntree", title : "Quantité Entrée", editable: false,filter:'text',editor: false}, 
-    { field:"contenant", title : "Recipient", editable: false,filter:'text',editor: false},
-    { field:"quantiteSortie",title:"Quantité Sortie",editable: false},
-    { field:"date_creation", title:"Date des Entrées récents",filter: "date",editable: false},
+    { field: 'id',title:"N",editable: false,width: '85px',resizable: false},
+    { field:'article.nom',title:"Nom Article",filter:'text',editable: false,width: '155px',resizable: false},                 
+    { field:"quantiteEntree", title : "Quantité Entrée", editable: false,filter:'text',editor: false,width: '155px',resizable: false}, 
+    { field:"contenant", title : "Recipient", editable: false,filter:'text',editor: false,width: '155px',resizable: false},
+    { field:"quantiteSortie",title:"Quantité Sortie",editable: true,width: '155px',resizable: false},
+    { field:"date_creation", title:"Date des Entrées récents",filter: "date",editable: false,width: '195px',resizable: false},
     // { field:"dateSortie", title:"Date de Sortie récents",filter: "date",editable: false}
 ];
 export const columnsStockEntree = [
@@ -33,6 +33,7 @@ export const columnsArticle = [
         { field:'price_usd_big',title:"Prix de Vente G($)",filter:'number',editable: true,editor: "text",width: '150px',resizable: false},
        ]
     },
+    // { title: 'Action',cell: 'myTemplate', filterable: false, width: '125px' }
 ];
 /**
  * 
@@ -53,14 +54,14 @@ id                  : number;
  */
 export const columnsDette = [
     { field: 'id',title:"N",editable: false,width: '90px',resizable: false},
-    { field:'marketeur.nom',title:"Marketeur",filter:'text',editor: "text",resizable: false,width: '120px',},
+    { field:'marketeur.nom',title:"Marketeur",filter:'text',editor:false,resizable: false,width: '120px',},
     { field:'date_creation',title:"Date Création",filter:'text',editable: false,editor: "text",width: '190px',resizable: false},
     { field:'stock.article.nom',title:"Marchandise",filter:'number',editable: false,width: '120px',resizable: false},
     {title:'Quantité',
     children: [
         { field:'quantite_emprunter',title:"Quantité Empruntée",filter:'number',editable: false,width: '158px',resizable: false},
-        { field:'quantite_restante',title:"Quantité Restante",filter:'number',editable: true,editor: "text",width: '145px',resizable: false},
-        { field:'quantite_vendu',title:"Quantité Vendu",filter:'number',editable: false,width: '130px',resizable: false}
+        { field:'quantite_restante',title:"Quantité Restante",filter:'number',editable: false,editor: "text",width: '145px',resizable: false},
+        { field:'quantite_vendu',title:"Quantité Vendu",filter:'number',editable: true,width: '130px',resizable: false}
     ]
     },
     {title:"Versenent Montant",

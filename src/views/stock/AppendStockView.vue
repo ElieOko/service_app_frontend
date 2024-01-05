@@ -7,12 +7,18 @@ import { useAxiosRequestWithToken } from '@/utils/service/api';
 import { ref, watchEffect } from 'vue';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
+import { Loader } from '@progress/kendo-vue-indicators'
 
+const type                  = "infinite-spinner"
+const show                  = ref<any>(false)
+// const  toggleLoader = () => {
+show.value = show.value ? false : 'loader';
 const stock = ref<IStockRequest>({
   article_fk:0,
   quantiteEntree :0,
   contenant : ""
 })
+show.value = false
 const showLoad = ref<boolean>(false)
 const tab = ["Cartons","Sac", "Autres"];
 const article = ref<Array<IArticle>>([])
@@ -38,8 +44,10 @@ watchEffect(async()=>{
         const data = (JSON.parse(JSON.stringify(stock.value))) as IStockRequest ;
         if( data.article_fk == 0 || data.quantiteEntree == 0  || data.contenant == ""){
             notify("Certains champs sont vide");
+            showLoad.value = false
             return
         }
+        show.value = true
         await(useAxiosRequestWithToken().post(`${ApiRoutes.StockCreate}`,data)
             .then(function (response) {
                 notify(response.data.message)
@@ -50,6 +58,7 @@ watchEffect(async()=>{
             .finally(function () {
                 //alert("Elie Oko");
                 showLoad.value = false
+                show.value = false
             }))
     }    
 </script>
@@ -101,7 +110,12 @@ watchEffect(async()=>{
                   
                 </div>
             </main>
-
+            <div v-if="show" class="k-loader-container k-loader-container-md k-loader-top">
+      <div class="k-loader-container-overlay k-overlay-dark" />
+      <div class="k-loader-container-inner">
+        <Loader :size="'large'" :type="type" />
+      </div>
+    </div>
 </template>
 <style>
   .spinner {

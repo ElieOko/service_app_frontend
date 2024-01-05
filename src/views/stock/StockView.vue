@@ -8,10 +8,11 @@ import { Grid, GridToolbar } from '@progress/kendo-vue-grid';
 import { ref, watchEffect } from 'vue';
 import { Loader } from '@progress/kendo-vue-indicators'
 
-const stock = ref<Array<IStock>>()
+const stock = ref<Array<IStock>>([])
 const loader       = ref<Boolean>(false)
 const show       = ref<Boolean>(true)
 const type = "infinite-spinner"
+const editField = ref<any>()
 const gridPageable = {
         buttonCount: 5,
         info: true,
@@ -25,6 +26,7 @@ const gridPageable = {
   const sort = ref<SortDescriptor[] | undefined>([
       { field: "id", dir: "asc" }
     ]);
+
   const filter = ref<CompositeFilterDescriptor>({logic: "and", filters: []});
     const pageChangeHandler = (event:any) => {
       loader.value = true;
@@ -34,7 +36,31 @@ const gridPageable = {
         take.value = event.page.take;
       }, 300);
     }
-
+const cellClick = (e: any) => {
+      if (e.dataItem.inEdit && e.field === editField.value) {
+        return;
+      }
+      exitEdit(e.dataItem, true);
+      editField.value = e.field;
+      e.dataItem.inEdit = e.field;
+    }
+    const exitEdit =  (dataItem:any, exitEdit:any) => {
+      if (!exitEdit && dataItem.inEdit) {
+        return;
+      }
+      stock.value.forEach((d:any) => {
+        if (d.inEdit) {
+          d.inEdit = undefined;
+        }
+      });
+      editField.value = undefined;
+    }
+    const itemChange =  (e:any)=> {
+            const data =  stock.value.slice();
+            const index = data.findIndex((d  => d.id === e.dataItem.id ))
+            data[index] = { ...data[index], [e.field]: e.value };
+            stock.value  = data;
+        }
     const filterChange =  (ev:any)=> {
       loader.value = true;
       console.log(ev);
@@ -44,7 +70,8 @@ const gridPageable = {
       }, 300);
     } 
 
-watchEffect(async()=>{
+    const fetchAllData = () =>{
+      watchEffect(async()=>{
         await(useAxiosRequestWithToken().get(`${ApiRoutes.StockList}`)
             .then(function (response) {
               stock.value = response.data.stocks as Array<IStock>
@@ -57,7 +84,33 @@ watchEffect(async()=>{
                 show.value = false
             }));
     })
-
+    }
+    fetchAllData()
+    const dataUpdate = ()=>{
+      loader.value = true
+      show.value = false
+      stock.value.map(async (art,key)=>{
+        const data = JSON.parse(JSON.stringify(art));
+        await(useAxiosRequestWithToken().post(`${ApiRoutes.StockUpdate}/${art.id}`,data)
+            .then(function (response) {
+              console.log(response);
+              if(stock.value.length - 1 == key){
+                fetchAllData()
+                loader.value = false
+              }
+              
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+            .finally(function () {
+              if(stock.value.length - 1 == key){
+                fetchAllData()
+                loader.value = false
+              }
+            }));
+      })
+    }
 </script>
 <template>
   <div class="flex flex-wrap -mx-6">
@@ -170,15 +223,19 @@ watchEffect(async()=>{
       </div>
   </div>
   <div class="mt-8" />
-
+  <button type="button" @click="dataUpdate" class="text-white mt-5 bg-gray-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+        Sauvegarder les Modifications<svg v-if="loader" class="spinner inline h-6 w-6 mr-3" viewBox="0 0 4 4"></svg>
+      </button>
   
   <grid
     @pagechange="pageChangeHandler"
-    :total ="stock?.length"
+    :total ="stock.length"
     :data-items="stock"
     :columns="columnsStock as any"
     :edit-field="'inEdit'"
     :filter="filter"
+    @cellclick="cellClick"
+    @itemchange="itemChange"
     @filterchange="filterChange"
     :loader="loader"
     :column-menu="true"

@@ -7,15 +7,22 @@ import { useAxiosRequestWithToken } from '@/utils/service/api';
 import { computed, ref, watchEffect } from 'vue';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
+import { Loader } from '@progress/kendo-vue-indicators'
+
     const article = ref<IArticleRequest>({
-nom: "",
-prixUnitaire: 0,
-devise_fk: 0,
-price_big: 0,
-type_article_fk: 0
-});
-    const showLoad = ref<boolean>(false)
-    const devise = ref<Array<IDevise>>()
+        nom: "",
+        prixUnitaire: 0,
+        devise_fk: 0,
+        price_big: 0,
+        type_article_fk: 0
+    });
+    const type          = "infinite-spinner"
+    const show          = ref<any>(false)
+// const  toggleLoader = () => {
+    show.value          = show.value ? false : 'loader';
+    const showLoad      = ref<boolean>(false)
+    show.value = false
+    const devise        = ref<Array<IDevise>>()
     const errorArticleType = computed(() => {
       return article.value.type_article_fk === 0 || article.value.type_article_fk === "" ? "Entrez le type d'article" : "";
     });
@@ -74,7 +81,7 @@ type_article_fk: 0
             showLoad.value = false
             return
         }
-        console.log("data send[] ->",data);
+        show.value = true
         await(useAxiosRequestWithToken().post(`${ApiRoutes.ArticleCreate}`,data)
             .then(function (response) {
                 notify(response.data.message)
@@ -85,6 +92,7 @@ type_article_fk: 0
             .finally(function () {
                 //alert("Elie Oko");
                 showLoad.value = false
+                show.value = false
             }))
     }
 </script>
@@ -158,6 +166,12 @@ type_article_fk: 0
 
                 </div>
     </main>
+    <div v-if="show" class="k-loader-container k-loader-container-md k-loader-top">
+      <div class="k-loader-container-overlay k-overlay-dark" />
+      <div class="k-loader-container-inner">
+        <Loader :size="'large'" :type="type" />
+      </div>
+    </div>
 </template>
 <style>
   .spinner {

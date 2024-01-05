@@ -11,10 +11,15 @@ import { Grid, GridToolbar } from '@progress/kendo-vue-grid';
 import { ref, watchEffect } from 'vue';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
+import { Loader } from '@progress/kendo-vue-indicators'
 
 const data = ref<Array<IDette>>([])
 const loader       = ref<Boolean>(false)
 const editField = ref<any>()
+const type = "infinite-spinner"
+const show       = ref<any>(false)
+// const  toggleLoader = () => {
+    show.value = show.value ? false : 'loader';
 const gridPageable = {
         buttonCount: 5,
         info: true,
@@ -98,17 +103,20 @@ const fetchAllData = ()=>{
             })
             .finally(function () {
                 //alert("Elie Oko");
+                show.value = false
             }));
     })
 }
 fetchAllData()
     const dataUpdate = ()=>{
+      show.value = true
       loader.value = true
       data.value.map(async (art,key)=>{
-        const data = JSON.parse(JSON.stringify(art));
-        await(useAxiosRequestWithToken().post(`${ApiRoutes.ArticleEdit}/${art.id}`,data)
+        const data2 = JSON.parse(JSON.stringify(art));
+        await(useAxiosRequestWithToken().post(`${ApiRoutes.DetteUpdate}/${art.id}`,data2)
             .then(function (response) {
               console.log(response);
+            
               if(data.value.length - 1 == key){
                 fetchAllData()
                 loader.value = false
@@ -117,8 +125,13 @@ fetchAllData()
             })
             .catch(function (error) {
                 console.log(error);
+                //notify(error.data.message)
             })
             .finally(function () {
+              if(data.value.length - 1 == key){
+                fetchAllData()
+                loader.value = false
+              }
             }));
       })
     }
@@ -158,12 +171,12 @@ fetchAllData()
   </div>  
   <div class="flex flex-wrap -mx-2">
     <div class=" ">
-      <button type="button"  class="text-white mt-5 bg-gray-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+      <button type="button" @click="dataUpdate" class="text-white mt-5 bg-gray-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
         Sauvegarder les Modifications<svg v-if="loader" class="spinner inline h-6 w-6 mr-3" viewBox="0 0 4 4"></svg>
       </button>
     </div>
     <div class="">
-      <button type="button"  class="text-white mt-5 bg-gray-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+      <button type="button" @click="exportExcelFile" class="text-white mt-5 bg-gray-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
         Exportation
       </button>
     </div>
@@ -187,5 +200,11 @@ fetchAllData()
             :take="take"
             :skip="skip">
         </grid>
+        <div v-if="show" class="k-loader-container k-loader-container-md k-loader-top">
+      <div class="k-loader-container-overlay k-overlay-dark" />
+      <div class="k-loader-container-inner">
+        <Loader :size="'large'" :type="type" />
+      </div>
+    </div>
 </div>
 </template>

@@ -10,7 +10,12 @@ import { Grid, GridToolbar } from '@progress/kendo-vue-grid';
 import { ref, watchEffect } from 'vue';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
+import { Loader } from '@progress/kendo-vue-indicators'
 
+const type                  = "infinite-spinner"
+const show                  = ref<any>(false)
+// const  toggleLoader = () => {
+show.value = show.value ? false : 'loader';
 const columnsFacturation = [
     { field: 'id',title:"N",editable: false},
     { field:'code.nom',title:"Code Facturation",filter:'text',editable: false},
@@ -20,6 +25,7 @@ const columnsFacturation = [
     { field:'prixTotal',title:"Prix Total",filter:'number',editable: false},
     { field:'created_at',title:"Date de création",filter:'date',editable: false},
 ];
+show.value = false
 const facturation = ref<IFacturationRequest>({
     stock_fk      : 0,
     quantite      : 0,
@@ -117,6 +123,7 @@ const submit_facturation = async ()=>{
     showLoad.value = false
   }
   else{
+    show.value = true
     await(useAxiosRequestWithToken().post(`${ApiRoutes.facturationCreate}`,data).then(function (response) {
               console.log(response)
                 notify(response.data.message);
@@ -135,6 +142,7 @@ const submit_facturation = async ()=>{
             .finally(function () {
                 //alert("Elie Oko");
                 showLoad.value = false
+                show.value = false
             }));
   }
 }                   
@@ -296,7 +304,12 @@ type_v()
                       </div>
                     </div>
                     </main>
-                         
+                    <div v-if="show" class="k-loader-container k-loader-container-md k-loader-top">
+      <div class="k-loader-container-overlay k-overlay-dark" />
+      <div class="k-loader-container-inner">
+        <Loader :size="'large'" :type="type" />
+      </div>
+    </div>        
 </template>
 <style>
   .spinner {
