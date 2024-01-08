@@ -63,7 +63,9 @@ watchEffect(async()=>{
             .then(function (response) {
               facturationList.value = response.data.facturations as Array<IFacturation>
               console.log(response.data)  
-    
+              facturationList.value.map((v:IFacturation,k:number)=>{
+                      facturationList.value[k].stock.article.prixUnitaire =   v.type_vente_fk == 2 ? v.stock.article.prixUnitaire as number: v.stock.article.price_big as number 
+                    })
             })
             .catch(function (error) {
                 console.log(error);
