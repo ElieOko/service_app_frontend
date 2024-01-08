@@ -18,12 +18,10 @@ const show                  = ref<any>(false)
 show.value = show.value ? false : 'loader';
 const columnsFacturation = [
     { field: 'id',title:"N",editable: false},
-    { field:'code.nom',title:"Code Facturation",filter:'text',editable: false},
     { field:'stock.article.nom',title:"Marchandise",filter:'number',editable: false},
     { field:'quantite',title:"Quantité",filter:'number',editable: false},
     { field:'stock.article.prixUnitaire',title:"Prix Unitaire",filter:'number',editable: false},
-    { field:'prixTotal',title:"Prix Total",filter:'number',editable: false},
-    { field:'created_at',title:"Date de création",filter:'date',editable: false},
+    { field:'prixTotal',title:"Prix Total",filter:'number',editable: false}
 ];
 show.value = false
 const facturation = ref<IFacturationRequest>({
@@ -131,7 +129,8 @@ const submit_facturation = async ()=>{
                     facturationList.value = response.data.facturation as Array<IFacturation>
                     console.log("test", facturationList) 
                     facturationList.value.map((v:IFacturation,k:number)=>{
-                      totalPrice.value += v.quantite * ( v.type_vente_fk == 2 ? v.stock.article.prixUnitaire as any as number : v.stock.article.price_big as any as number )
+                      // v.quantite * ( v.type_vente_fk == 2 ? v.stock.article.prixUnitaire as any as number : v.stock.article.price_big as any as number )
+                      totalPrice.value += v.prixTotal
                       qte.value += v.quantite
                     })
                 }
@@ -233,7 +232,7 @@ type_v()
                 </div>
             </main>
             <div class="mt-8" />
-            <div id ="printable-content" class="p-4 bg-white border rounded-lg shadow-lg px-4 py-4 max-w-xl mx-auto mt-8">
+            <!-- <div id ="printable-content" class="p-4 bg-white border rounded-lg shadow-lg px-4 py-4 max-w-xl mx-auto mt-8">
     <h1 class="font-bold text-2xl my-4 text-center text-blue-600">Drapeau ya Mboka</h1>
     <hr class="mb-2">
     <div class="flex justify-between mb-6">
@@ -276,14 +275,22 @@ type_v()
             
         </tfoot>
     </table>
-    <!-- <div class="text-gray-700 mb-2">Thank you for your business!</div> -->
+ <div class="text-gray-700 mb-2">Thank you for your business!</div> 
 
-</div> 
+</div>  -->
             <main>
             <div id ="printable-content">
-              <h4 class="mb-4 text-lg font-semibold text-gray-600 dark:text-gray-300">
-                       Facturation {{ mr }}
-                    </h4>
+              <div class="flex justify-between mb-6">
+        <h1 class="text-lg font-bold">Facturation</h1>
+        <div class="text-gray-700">
+            <div>Facture n#: {{ code?.nom }}</div>
+        </div>
+    </div>
+                    <h2 class="text-lg font-bold">Adresse :</h2>
+        <div class="text-gray-700 mb-2">Bokasa Olela</div>
+        <div class="text-gray-700 mb-2">N° 6</div>
+        <div class="text-gray-700 font-bold mb-2">Client</div>
+        <div class="text-gray-700">{{ "" }}</div>
                     <div class="mt-8" />
               <grid
                 @pagechange="pageChangeHandler"
@@ -302,6 +309,7 @@ type_v()
                           </div>
                         </div>
                       </div>
+                      <div class="text-gray-700 font-bold mb-2">Total {{ totalPrice }}fc</div>  
                     </div>
                     </main>
                     <div v-if="show" class="k-loader-container k-loader-container-md k-loader-top">
@@ -309,7 +317,9 @@ type_v()
       <div class="k-loader-container-inner">
         <Loader :size="'large'" :type="type" />
       </div>
-    </div>        
+    
+    </div>  
+        
 </template>
 <style>
   .spinner {
