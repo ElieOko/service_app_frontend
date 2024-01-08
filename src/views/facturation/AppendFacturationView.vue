@@ -131,6 +131,7 @@ const submit_facturation = async ()=>{
                     facturationList.value.map((v:IFacturation,k:number)=>{
                       // v.quantite * ( v.type_vente_fk == 2 ? v.stock.article.prixUnitaire as any as number : v.stock.article.price_big as any as number )
                       totalPrice.value += v.prixTotal
+                      facturationList.value[k].stock.article.prixUnitaire =   v.type_vente_fk == 2 ? v.stock.article.prixUnitaire as number: v.stock.article.price_big as number
                       qte.value += v.quantite
                     })
                 }
