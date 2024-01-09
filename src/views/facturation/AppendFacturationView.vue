@@ -128,6 +128,7 @@ const submit_facturation = async ()=>{
                 if(response.data.message == "Enregistrement réussie avec succès"){
                     facturationList.value = response.data.facturation as Array<IFacturation>
                     console.log("test", facturationList) 
+                    totalPrice.value = 0
                     facturationList.value.map((v:IFacturation,k:number)=>{
                       // v.quantite * ( v.type_vente_fk == 2 ? v.stock.article.prixUnitaire as any as number : v.stock.article.price_big as any as number )
                       totalPrice.value += v.prixTotal

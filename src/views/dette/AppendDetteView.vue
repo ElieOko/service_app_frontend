@@ -176,6 +176,7 @@ const submit_facturation = async ()=>{
                 if(response.data.message == "Enregistrement réussie avec succès"){
                     dette_list.value = response.data.dettes as Array<IDette>
                     console.log("test", facturationList) 
+                    totalPrice.value = 0
                     dette_list.value.map((v:IDette,k:number)=>{
                     //   mr.value = v.code.nom
                       totalPrice.value += v.montant_final
