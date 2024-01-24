@@ -35,23 +35,6 @@ export const columnsArticle = [
     },
     // { title: 'Action',cell: 'myTemplate', filterable: false, width: '125px' }
 ];
-/**
- * 
- * 
-
-
-id                  : number;
-    code_fk             : number;
-    stock_fk            : number;
-    marketeur_fk        : number;
-    type_vente_fk       : number;
-    status_fk           : number;
-    note                : string;
-    observation         : string;
-    date_creation       : string;
-    code                : ICodeFacture;
-    type_ventes         : ITypeVente;
- */
 export const columnsDette = [
     { field: 'id',title:"N",editable: false,width: '90px',resizable: false},
     { field:'marketeur.nom',title:"Marketeur",filter:'text',editor:false,resizable: false,width: '120px',},
@@ -79,15 +62,14 @@ export const columnsDette = [
     { field:'observation',title:"Observation",filter:'text',editable: true,editor: "text",width: '190px',resizable: false}
     ]},
 ];// 
-
 export const columnsStockSortie = [
-    { field: 'id',title:"N",editable: false},
-    { field:'stock.article.nom',title:"Nom Article",filter:'text',editable: false},
-    { field:'quantite',title:"Quantité Sortie",filter:'number',editable: false},
-    { field:'prixUnitaire',title:"Prix Unitaire",filter:'number',editable: false},
-    { field:'prixTotal',title:"Prix de Vente total",filter:'number',editable: false}
+    { field: 'id',title:"N",editable: false,resizable: false,width: '120px'},
+    {field:"",title:"Date Sortie",resizable: false,width: '190px'},
+    { field:'stock.article.nom',title:"Nom Article",filter:'text',editable: false,resizable: false,width: '210px'},
+    { field:'quantite',title:"Quantité Sortie",filter:'number',editable: false,resizable: false,width: '140px'},
+    { field:'prixUnitaire',title:"Prix Unitaire",filter:'number',editable: false,resizable: false,width: '140px'},
+    { field:'prixTotal',title:"Prix de Vente total",filter:'number',editable: false,resizable: false,width: '190px'}
 ];
-
 export const columnsFacturation = [
     { field: 'id',title:"N",editable: false},
     { field:'code.nom',title:"Code Facturation",filter:'text',editable: false},
@@ -97,17 +79,29 @@ export const columnsFacturation = [
     { field:'prixTotal',title:"Prix Total",filter:'number',editable: false},
     { field:'created_at',title:"Date de création",filter:'date',editable: false},
 ];
-
 export const columnsMarketeur = [
     { field: 'id',title:"N",editable: false},
     { field:'nom',title:"Nom Complet Marketeur",filter:'text',editable: false},
     { field:'action',title:"Action",filter:'text',editable: false},
 ];
-
-
-// id          : number
-// code        : string
-// quantite    : number
-// article  : number
-// prixTotal   : number
-// dateCreated : string
+export const columnsDetteByMarketeur = [
+    { field: 'id', title: "N", editable: false },
+    { field: 'date_recent', title: "Date dette encours", filter: 'text', editable: false },
+    { field: 'nom', title: "Marketeur", filter: 'text', editable: false },
+    { field: 'sum_dette', title: "Nombre de dette", filter: 'text', editable: false },
+    { field:'action',title:"Contrôle",filter:'text',editable: false},
+];
+export const columnsVersementAll = [
+    { field: 'id', title: "N", editable: false },
+    { field: 'date_recent', title: "Date dette encours", filter: 'text', editable: false },
+    { field: 'nom', title: "Marketeur", filter: 'text', editable: false },
+    { field: 'sum_dette', title: "Nombre de dette", filter: 'text', editable: false },
+    { field:'action',title:"Contrôle",filter:'text',editable: false},
+];
+export const columnsVersementDetail = [
+    { field: 'id', title: "N", editable: false },
+    { field: 'date_recent', title: "Date dette encours", filter: 'text', editable: false },
+    { field: 'nom', title: "Marketeur", filter: 'text', editable: false },
+    { field: 'sum_dette', title: "Nombre de dette", filter: 'text', editable: false },
+    { field:'action',title:"Contrôle",filter:'text',editable: false},
+];

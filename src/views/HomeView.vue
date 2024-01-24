@@ -56,21 +56,22 @@ const stock = ref<Array<IStock>>()
                     </h2>
                     <div class="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-4">
                         <!-- Card -->
-                        <a href="#" class="flex items-center p-4 bg-white border border-1 border-gray-100 rounded-lg  shadow-xs dark:bg-gray-800">
-                            <div class="p-3 mr-4 text-orange-500 bg-orange-100 rounded-full dark:text-orange-100 dark:bg-orange-500">
-                                <i class="w-5 h-5 fa fa-store"></i>
-                            </div>
-                            <div>
-                                <p class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
-                                    Quantité En Stock
-                                </p>
-                                <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
-                                    {{ totalQteEntrer }}
-                                </p>
-                            </div>
-                        </a>
+                        <router-link class="flex items-center p-4 bg-white border border-1 border-gray-100 rounded-lg  shadow-xs dark:bg-gray-800" to="/stock">
+                           <div class="p-3 mr-4 text-orange-500 bg-orange-100 rounded-full dark:text-orange-100 dark:bg-orange-500">
+                                        <i class="w-5 h-5 fa fa-store"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+                                            Quantité En Stock
+                                        </p>
+                                        <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
+                                            {{ totalQteEntrer }}
+                                        </p>
+                                    </div>
+                            </router-link>
+                       
                         <!-- Card -->
-                        <div class="flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
+                         <router-link class="flex items-center p-4 bg-white border border-1 border-gray-100 rounded-lg  shadow-xs dark:bg-gray-800" to="/stock/historique/entree">
                             <div class="p-3 mr-4 text-green-500 bg-green-100 rounded-full dark:text-green-100 dark:bg-green-500">
                                 <i class="w-5 h-5 fa fa-store"></i>
                             </div>
@@ -82,21 +83,21 @@ const stock = ref<Array<IStock>>()
                                     {{ totalQteAll }}
                                 </p>
                             </div>
-                        </div>
+                        </router-link>
                         <!-- Card -->
-                        <div class="flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
+                        <router-link class="flex items-center p-4 bg-white border border-1 border-gray-100 rounded-lg  shadow-xs dark:bg-gray-800" to="/stock/historique/sortie">
                             <div class="p-3 mr-4 text-blue-500 bg-blue-100 rounded-full dark:text-blue-100 dark:bg-blue-500">
                                 <i class="w-5 h-5 fa fa-store"></i>
                             </div>
                             <div>
                                 <p class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
-                                    Sortie en Stock
+                                  Toutes les Sorties en Stock
                                 </p>
                                 <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
                                     {{ totalQteSortie }}
                                 </p>
                             </div>
-                        </div>
+                        </router-link>
                         <!-- Card -->
                         <div class="flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800">
                             <div class="p-3 mr-4 text-teal-500 bg-teal-100 rounded-full dark:text-teal-100 dark:bg-teal-500">
@@ -111,11 +112,61 @@ const stock = ref<Array<IStock>>()
                                 </p>
                             </div>
                         </div>
+                        <router-link class="flex items-center p-4 bg-white border border-1 border-gray-100 rounded-lg  shadow-xs dark:bg-gray-800" to="/dette">
+                            <div class="p-3 mr-4 text-green-500 bg-green-100 rounded-full dark:text-green-100 dark:bg-green-500">
+                                 <i class="w-5 h-5 fa fa-store"></i>
+                            </div>
+                            <div>
+                                <p class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">Dettes</p>
+                                <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
+                                       {{ "Toutes les dettes" }}
+                                    </p>
+                            </div>
+                        </router-link>
+                        <router-link class="flex items-center p-4 bg-white border border-1 border-gray-100 rounded-lg  shadow-xs dark:bg-gray-800" to="/facturation">
+                                <div class="p-3 mr-4 text-blue-500 bg-blue-100 rounded-full dark:text-blue-100 dark:bg-blue-500">
+                                    <i class="w-5 h-5 fa fa-store"></i>
+                                </div>
+                                <div>
+                                    <p class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+                                      Facturation
+                                    </p>
+                                    <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
+                                        {{ "Vente" }}
+                                    </p>
+                                </div>
+                        </router-link>
+                         <router-link class="flex items-center p-4 bg-white border border-1 border-gray-100 rounded-lg  shadow-xs dark:bg-gray-800" to="/facturation">
+                            <div class="p-3 mr-4 text-orange-500 bg-blue-100 rounded-full dark:text-blue-100 dark:bg-orange-500">
+                                <i class="w-5 h-5 fa fa-store"></i>
+                            </div>
+                            <div>
+                                <p class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+                                    {{ "Rapport" }}
+                                </p>
+                                <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
+                                    {{ "Journalier" }}
+                                </p>
+                            </div>
+                        </router-link>
+                        <router-link class="flex items-center p-4 bg-white border border-1 border-gray-100 rounded-lg  shadow-xs dark:bg-gray-800" to="/versement">
+                                    <div class="p-3 mr-4 text-blue-500 bg-blue-100 rounded-full dark:text-blue-100 dark:bg-blue-500">
+                                        <i class="w-5 h-5 fa fa-store"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400">
+                                          Versement
+                                        </p>
+                                        <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">
+                                            {{ "Tous les versements" }}
+                                        </p>
+                                    </div>
+                            </router-link>
                     </div>
                 </div>
                 <!-- component -->
                 <div class="flex items-center justify-center  bg-gray-100">
-                    <section class="w-full p-6 rounded-lg max-w-2xl shadow-lg shadow-gray-300 bg-white">
+                    <section class="w-full p-8 rounded-lg max-w-1xl shadow-lg shadow-gray-300 bg-blue-300">
                         <header class="flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 shrink-0 w-6 h-6 text-gray-500" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
           <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -123,7 +174,7 @@ const stock = ref<Array<IStock>>()
           <path d="M4 15l4 -6l4 2l4 -5l4 4"></path>
         </svg>
               <h3 class="font-medium text-lg">
-                Stock
+                Stock encours
               </h3>
           <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 shrink-0 w-6 h-6 text-gray-500" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
           <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -132,7 +183,7 @@ const stock = ref<Array<IStock>>()
           <path d="M11 12h1v4h1"></path>
         </svg>
     </header>
-    <section class="py-4 grid grid-cols-2 gap-x-6">
+    <section class="py-4 grid xl:grid-cols-3 sm:grid-cols-1 gap-x-6">
       <div v-for="(item,index) in stock" class="flex items-center py-3">
         <span class="w-8 h-8 shrink-0 mr-4 rounded-full bg-blue-50 flex items-center justify-center">
                             <svg

@@ -18,6 +18,8 @@ import DetteView from '../views/dette/DetteView.vue'
 //@ts-ignore
 import AppendDetteView from '../views/dette/AppendDetteView.vue'
 //@ts-ignore
+import SpecialDetteView from '../views/dette/SpecialDetteView.vue'
+//@ts-ignore
 import FacturationView from '../views/facturation/FacturationView.vue'
 //@ts-ignore
 import AppendStockView from '../views/stock/AppendStockView.vue'
@@ -39,6 +41,10 @@ import SignalView from '../views/signal/SignalView.vue'
 import AppendSignalView from '../views/signal/AppendSignalView.vue'
 //@ts-ignore
 import AppendTauxView from '../views/taux/AppendTauxView.vue'
+//@ts-ignore
+import VersementView from '../views/versement/VersementView.vue'
+//@ts-ignore
+import DetailVersementView from '../views/versement/DetailVersementView.vue'
 //@ts-ignore
 import ErrorView from '../views/ErrorView.vue'
 import { getUser } from '@/stores/user'
@@ -85,7 +91,14 @@ const routes : RouteRecordRaw[] =  [
       name: 'dette_add',
       component: AppendDetteView,
       meta:{ requiresAuth: true , reload: true}
+     },
+    {
+      path: '/dette/special',
+      name: 'dette_special',
+      component: SpecialDetteView,
+      meta:{ requiresAuth: true , reload: true}
     },
+    
     {
       path: '/facturation',
       name: 'facturation',
@@ -103,6 +116,18 @@ const routes : RouteRecordRaw[] =  [
       path: '/taux',
       name: 'taux',
       component: AppendTauxView,
+      meta:{ requiresAuth: true , reload: true}
+  },
+    {
+      path: '/versement',
+      name: 'versement',
+      component: VersementView,
+      meta:{ requiresAuth: true , reload: true}
+  },
+    {
+      path: '/versement/detail',
+      name: 'versement_detail',
+      component: DetailVersementView,
       meta:{ requiresAuth: true , reload: true}
     },
     {

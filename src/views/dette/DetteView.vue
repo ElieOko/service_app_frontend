@@ -138,7 +138,7 @@ fetchAllData()
 </script>
 <template>
   <div class="flex flex-wrap -mx-6">
-    <div class="w-full px-6 mt-6 sm:w-1/2 xl:w-1/3 sm:mt-0">
+    <div class="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-4">
       <router-link to="dette/add" >
           <div
             class="flex items-center px-5 py-6 hover:bg-blue-200 bg-white rounded-md shadow-sm"
@@ -167,6 +167,33 @@ fetchAllData()
             </div>
           </div>
       </router-link>
+       <router-link to="dette/special" >
+            <div
+              class="flex items-center px-5 py-6 hover:bg-blue-600 bg-blue-300 rounded-md shadow-sm">
+              <div class="p-3 bg-gray-600 bg-opacity-75 rounded-full">
+                <svg
+                class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20"
+                >
+                <path
+                d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"
+              />
+              <path
+                fill-rule="evenodd"
+                d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+                clip-rule="evenodd"
+              />
+                </svg>
+              </div>
+              <div class="mx-5">
+                <h4 class="text-2xl font-semibold text-gray-700">
+                  Ajouter une  Dette
+                </h4>
+                <div class="text-gray-500">
+                Spécial
+                </div>
+              </div>
+            </div>
+        </router-link>
     </div>
   </div>  
   <div class="flex flex-wrap -mx-2">

@@ -11,13 +11,14 @@ import { Loader } from '@progress/kendo-vue-indicators'
 
 
 const columnsFacturation = [
-    { field: 'id',title:"N",editable: false},
-    { field:'code.nom',title:"Code Facturation",filter:'text',editable: false},
-    { field:'stock.article.nom',title:"Marchandise",filter:'number',editable: false},
-    { field:'quantite',title:"Quantité",filter:'number',editable: false},
-    { field:'stock.article.prixUnitaire',title:"Prix Unitaire",filter:'number',editable: false},
-    { field:'prixTotal',title:"Prix Total",filter:'number',editable: false},
-    { field:'created_at',title:"Date de création",filter:'date',editable: false},
+    { field: 'id', title: "N", editable: false, resizable: false, width: '100px' },
+    { field: 'created_at', title: "Date de création", filter: 'date', editable: false, resizable: false, width: '210px' },
+    { field:'code.nom',title:"Code Facturation",filter:'text',editable: false, resizable: false, width: '200px' },
+    { field:'stock.article.nom',title:"Marchandise",filter:'number',editable: false, resizable: false, width: '210px' },
+    { field:'quantite',title:"Quantité",filter:'number',editable: false, resizable: false, width: '120px' },
+    { field:'stock.article.prixUnitaire',title:"Prix Unitaire",filter:'number',editable: false, resizable: false, width: '160px' },
+    { field:'prixTotal',title:"Prix Total",filter:'number',editable: false,resizable: false, width: '140px'},
+   
 ];
 const loader       = ref<Boolean>(false)
 const show       = ref<Boolean>(true)
