@@ -8,8 +8,8 @@ import { clearAppMode } from '@/stores/appMode'
 const store = useCfStore()
 const router = useRouter()
 const orgCode = ref('DEMO')
-const username = ref('facturier')
-const password = ref('fac123')
+const username = ref('caissier')
+const password = ref('caissier')
 const loading = ref(false)
 const showPassword = ref(false)
 
@@ -36,8 +36,10 @@ function back() {
       <p class="cf-login__brand">Chambre Froide</p>
       <h1>Connexion organisation</h1>
       <p class="cf-login__hint">
-        Chaque organisation a son propre espace isolé.<br />
-        Démo : code <strong>DEMO</strong> (facturier/fac123) · code <strong>FROIDPLUS</strong> (admin/froid123)
+        Code org <strong>DEMO</strong> — identifiants (mot de passe = identifiant) :<br />
+        <strong>caissier</strong> · <strong>superviseur</strong> · <strong>directeur</strong> ·
+        facturier · admin<br />
+        Autre org : <strong>FROIDPLUS</strong> / admin / admin
       </p>
 
       <label>
