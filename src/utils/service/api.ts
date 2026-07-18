@@ -2,7 +2,7 @@ import axios, { type AxiosInstance } from "axios";
 //https://www.jstoolset.com/jwt
 export const useAxiosRequestWithToken = (tokens:string = "") : AxiosInstance  =>{
     const useAxios: AxiosInstance = axios.create({
-        baseURL               : "https://server.drapeauyamboka.com/api/",
+        baseURL               : "http://localhost:8000/api/",
         headers   : {
           accept: 'application/json',
           "Content-type"      :   "application/json",
