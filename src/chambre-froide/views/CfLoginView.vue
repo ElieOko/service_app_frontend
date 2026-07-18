@@ -7,6 +7,7 @@ import { clearAppMode } from '@/stores/appMode'
 
 const store = useCfStore()
 const router = useRouter()
+const orgCode = ref('DEMO')
 const username = ref('facturier')
 const password = ref('fac123')
 const loading = ref(false)
@@ -15,7 +16,7 @@ const showPassword = ref(false)
 function login() {
   loading.value = true
   try {
-    const res = store.login(username.value.trim(), password.value)
+    const res = store.login(orgCode.value.trim(), username.value.trim(), password.value)
     toast(res.message, { autoClose: 4000 })
     if (res.ok) router.push('/cf')
   } finally {
@@ -33,11 +34,16 @@ function back() {
   <div class="cf-login">
     <form class="cf-login__card" @submit.prevent="login">
       <p class="cf-login__brand">Chambre Froide</p>
-      <h1>Connexion</h1>
+      <h1>Connexion organisation</h1>
       <p class="cf-login__hint">
-        Comptes démo : admin/admin123 · facturier/fac123 · caissier/cai123 · superviseur/sup123 · directeur/dir123
+        Chaque organisation a son propre espace isolé.<br />
+        Démo : code <strong>DEMO</strong> (facturier/fac123) · code <strong>FROIDPLUS</strong> (admin/froid123)
       </p>
 
+      <label>
+        Code organisation
+        <input v-model="orgCode" type="text" autocomplete="organization" required placeholder="ex: DEMO" />
+      </label>
       <label>
         Identifiant
         <input v-model="username" type="text" autocomplete="username" required />
@@ -56,8 +62,11 @@ function back() {
       </label>
 
       <button type="submit" :disabled="loading">
-        {{ loading ? 'Connexion…' : 'Se connecter' }}
+        {{ loading ? 'Connexion…' : 'Entrer dans mon organisation' }}
       </button>
+      <router-link class="cf-login__link" to="/cf/register-org">
+        Créer une nouvelle organisation
+      </router-link>
       <button type="button" class="ghost" @click="back">Retour au choix de module</button>
     </form>
   </div>
@@ -78,7 +87,7 @@ function back() {
 }
 
 .cf-login__card {
-  width: min(440px, 100%);
+  width: min(460px, 100%);
   background: rgba(255, 255, 255, 0.92);
   border: 1px solid rgba(11, 61, 74, 0.08);
   border-radius: 1.25rem;
@@ -106,7 +115,7 @@ h1 {
   margin: 0;
   font-size: 0.85rem;
   color: #5d7a84;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 label {
@@ -145,5 +154,12 @@ button.ghost {
   background: transparent;
   color: #0b3d4a;
   border: 1px solid #c9d7db;
+}
+
+.cf-login__link {
+  text-align: center;
+  color: #0f7f7a;
+  font-weight: 700;
+  text-decoration: none;
 }
 </style>

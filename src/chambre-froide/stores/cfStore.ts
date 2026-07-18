@@ -2,27 +2,37 @@ import { computed, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import type {
   CfActivityLog,
-  CfDatabase,
   CfInvoice,
   CfInvoiceLine,
   CfNotification,
+  CfOrganization,
+  CfPlatformDatabase,
   CfPriceHistory,
   CfProduct,
   CfRole,
+  CfSession,
   CfStockMovement,
   CfSupplier,
   CfUser,
+  CfWorkspace,
   NotificationType,
   StockMovementType,
 } from '../types'
 import {
+  CF_DB_KEY,
   CF_SESSION_KEY,
   CF_SYNC_CHANNEL,
-  createSeedDatabase,
-  exportDatabaseJson,
-  importDatabaseJson,
-  loadDatabase,
-  saveDatabase,
+  createDemoWorkspace,
+  createEmptyWorkspace,
+  createSeedPlatform,
+  exportOrgWorkspaceJson,
+  exportPlatformJson,
+  importPlatformJson,
+  loadPlatform,
+  normalizeOrgCode,
+  readSession as readStoredSession,
+  savePlatform,
+  writeSession,
 } from '../db'
 import {
   formatMoney,
@@ -37,34 +47,50 @@ const PRICE_ROLES: CfRole[] = ['Administrateur', 'Directeur']
 const SUPERVISOR_ROLES: CfRole[] = ['Administrateur', 'Directeur', 'Superviseur']
 const ADMIN_ROLES: CfRole[] = ['Administrateur', 'Directeur']
 
+function emptyWorkspace(): CfWorkspace {
+  return createEmptyWorkspace('tmp')
+}
+
 export const useCfStore = defineStore('chambreFroide', () => {
-  const db = ref<CfDatabase>(loadDatabase())
-  const currentUser = ref<CfUser | null>(readSession())
+  const platform = ref<CfPlatformDatabase>(loadPlatform())
+  const session = ref<CfSession | null>(readStoredSession())
+  const currentOrg = ref<CfOrganization | null>(null)
+  const currentUser = ref<CfUser | null>(null)
+  const db = ref<CfWorkspace>(emptyWorkspace())
   const searchQuery = ref('')
 
-  function persist() {
-    saveDatabase(db.value)
-  }
-
-  function readSession(): CfUser | null {
-    const raw = localStorage.getItem(CF_SESSION_KEY)
-    if (!raw) return null
-    try {
-      return JSON.parse(raw) as CfUser
-    } catch {
-      return null
+  function bindSession(next: CfSession | null) {
+    session.value = next
+    writeSession(next)
+    if (!next) {
+      currentOrg.value = null
+      currentUser.value = null
+      db.value = emptyWorkspace()
+      return
     }
+    const org = platform.value.organizations.find((o) => o.id === next.organizationId) || null
+    currentOrg.value = org
+    currentUser.value = next.user
+    db.value = platform.value.workspaces[next.organizationId]
+      ? platform.value.workspaces[next.organizationId]
+      : emptyWorkspace()
   }
 
-  function setSession(user: CfUser | null) {
-    currentUser.value = user
-    if (user) localStorage.setItem(CF_SESSION_KEY, JSON.stringify(user))
-    else localStorage.removeItem(CF_SESSION_KEY)
+  // Restore workspace from existing session on boot
+  if (session.value) {
+    bindSession(session.value)
+  }
+
+  function persist() {
+    if (!currentOrg.value) return
+    platform.value.workspaces[currentOrg.value.id] = db.value
+    savePlatform(platform.value)
   }
 
   function reloadFromStorage() {
-    db.value = loadDatabase()
-    currentUser.value = readSession()
+    platform.value = loadPlatform()
+    const stored = readStoredSession()
+    bindSession(stored)
   }
 
   // Real-time sync across tabs/posts
@@ -76,11 +102,12 @@ export const useCfStore = defineStore('chambreFroide', () => {
       // ignore
     }
     window.addEventListener('storage', (e) => {
-      if (e.key === 'cf_database_v2' || e.key === CF_SESSION_KEY) reloadFromStorage()
+      if (e.key === CF_DB_KEY || e.key === CF_SESSION_KEY) reloadFromStorage()
     })
   }
 
   function log(action: string, details?: string, user?: CfUser | null) {
+    if (!currentOrg.value) return
     const actor = user ?? currentUser.value
     const { date, time, iso } = nowParts()
     const entry: CfActivityLog = {
@@ -99,6 +126,7 @@ export const useCfStore = defineStore('chambreFroide', () => {
   }
 
   function notify(type: NotificationType, title: string, message: string) {
+    if (!currentOrg.value) return
     const n: CfNotification = {
       id: uid('notif'),
       type,
@@ -111,28 +139,179 @@ export const useCfStore = defineStore('chambreFroide', () => {
     persist()
   }
 
-  function login(username: string, password: string): { ok: boolean; message: string } {
-    const user = db.value.users.find(
+  function findOrgByCode(code: string): CfOrganization | undefined {
+    const normalized = normalizeOrgCode(code)
+    return platform.value.organizations.find((o) => o.code === normalized)
+  }
+
+  function login(
+    orgCode: string,
+    username: string,
+    password: string,
+  ): { ok: boolean; message: string } {
+    const org = findOrgByCode(orgCode)
+    if (!org) {
+      return { ok: false, message: 'Organisation introuvable. Vérifiez le code.' }
+    }
+    if (!org.isActive) {
+      return { ok: false, message: 'Cette organisation est désactivée' }
+    }
+
+    const workspace = platform.value.workspaces[org.id]
+    if (!workspace) {
+      return { ok: false, message: 'Espace organisation invalide' }
+    }
+
+    const user = workspace.users.find(
       (u) => u.username.toLowerCase() === username.toLowerCase() && u.password === password,
     )
     if (!user) {
-      notify('acces_refuse', 'Accès non autorisé', `Tentative de connexion échouée pour « ${username} ».`)
-      log('Tentative de connexion échouée', `Utilisateur: ${username}`, null)
+      // Tentative sur le workspace cible sans session
+      const { date, time, iso } = nowParts()
+      workspace.logs.unshift({
+        id: uid('log'),
+        userId: 'anonymous',
+        userName: 'Anonyme',
+        action: 'Tentative de connexion échouée',
+        details: `Utilisateur: ${username}`,
+        date,
+        time,
+        ip: getClientIp(),
+        createdAt: iso,
+      })
+      workspace.notifications.unshift({
+        id: uid('notif'),
+        type: 'acces_refuse',
+        title: 'Accès non autorisé',
+        message: `Tentative de connexion échouée pour « ${username} ».`,
+        read: false,
+        createdAt: iso,
+      })
+      platform.value.workspaces[org.id] = workspace
+      savePlatform(platform.value)
       return { ok: false, message: 'Identifiant ou mot de passe incorrect' }
     }
     if (!user.isActive) {
-      notify('acces_refuse', 'Compte désactivé', `Le compte « ${username} » est inactif.`)
       return { ok: false, message: 'Compte désactivé' }
     }
-    setSession(user)
-    log('Connexion', `Rôle: ${user.role}`, user)
-    return { ok: true, message: `Bienvenue ${user.fullName}` }
+
+    const nextSession: CfSession = {
+      organizationId: org.id,
+      organizationCode: org.code,
+      organizationName: org.name,
+      user,
+    }
+    bindSession(nextSession)
+    log('Connexion', `Org: ${org.code} · Rôle: ${user.role}`, user)
+    return { ok: true, message: `Bienvenue ${user.fullName} — ${org.name}` }
+  }
+
+  function registerOrganization(payload: {
+    name: string
+    code: string
+    phone?: string
+    email?: string
+    address?: string
+    adminFullName: string
+    adminUsername: string
+    adminPassword: string
+    withDemoData?: boolean
+  }): { ok: boolean; message: string } {
+    const code = normalizeOrgCode(payload.code)
+    if (!payload.name.trim()) return { ok: false, message: 'Nom de l’organisation requis' }
+    if (!code || code.length < 3) return { ok: false, message: 'Code organisation trop court (min. 3)' }
+    if (platform.value.organizations.some((o) => o.code === code)) {
+      return { ok: false, message: 'Ce code organisation est déjà utilisé' }
+    }
+    if (!payload.adminUsername.trim() || !payload.adminPassword) {
+      return { ok: false, message: 'Compte administrateur requis' }
+    }
+
+    const org: CfOrganization = {
+      id: uid('org'),
+      name: payload.name.trim(),
+      code,
+      phone: payload.phone?.trim() || undefined,
+      email: payload.email?.trim() || undefined,
+      address: payload.address?.trim() || undefined,
+      isActive: true,
+      createdAt: nowParts().iso,
+    }
+
+    const workspace = payload.withDemoData
+      ? createDemoWorkspace(org.id)
+      : createEmptyWorkspace(org.id, {
+          fullName: payload.adminFullName,
+          username: payload.adminUsername,
+          password: payload.adminPassword,
+        })
+
+    if (payload.withDemoData) {
+      // Remplacer l'admin démo par le compte saisi
+      const admin = workspace.users.find((u) => u.role === 'Administrateur') || workspace.users[0]
+      if (admin) {
+        admin.fullName = payload.adminFullName.trim()
+        admin.username = payload.adminUsername.trim()
+        admin.password = payload.adminPassword
+        admin.organizationId = org.id
+      }
+      workspace.users.forEach((u) => {
+        u.organizationId = org.id
+      })
+    }
+
+    platform.value.organizations.push(org)
+    platform.value.workspaces[org.id] = workspace
+    savePlatform(platform.value)
+
+    const adminUser = workspace.users.find(
+      (u) => u.username.toLowerCase() === payload.adminUsername.trim().toLowerCase(),
+    )!
+    bindSession({
+      organizationId: org.id,
+      organizationCode: org.code,
+      organizationName: org.name,
+      user: adminUser,
+    })
+    log('Création organisation', org.code, adminUser)
+    return { ok: true, message: `Organisation « ${org.name} » créée (code ${org.code})` }
+  }
+
+  function updateOrganization(payload: {
+    name: string
+    phone?: string
+    email?: string
+    address?: string
+  }) {
+    if (!canManageUsers() || !currentOrg.value) throw new Error('Accès non autorisé')
+    const org = platform.value.organizations.find((o) => o.id === currentOrg.value!.id)
+    if (!org) throw new Error('Organisation introuvable')
+    org.name = payload.name.trim()
+    org.phone = payload.phone?.trim() || undefined
+    org.email = payload.email?.trim() || undefined
+    org.address = payload.address?.trim() || undefined
+    currentOrg.value = org
+    if (session.value) {
+      session.value.organizationName = org.name
+      writeSession(session.value)
+    }
+    savePlatform(platform.value)
+    log('Modification organisation', org.name)
+    return org
   }
 
   function logout() {
     if (currentUser.value) log('Déconnexion')
-    setSession(null)
+    bindSession(null)
   }
+
+  function leaveOrganization() {
+    logout()
+  }
+
+  const organizations = computed(() =>
+    [...platform.value.organizations].sort((a, b) => a.name.localeCompare(b.name, 'fr')),
+  )
 
   function hasRole(...roles: CfRole[]) {
     return !!currentUser.value && roles.includes(currentUser.value.role)
@@ -565,8 +744,15 @@ export const useCfStore = defineStore('chambreFroide', () => {
   }
 
   // ---------- Users ----------
-  function upsertUser(payload: Omit<CfUser, 'id' | 'createdAt'> & { id?: string }) {
-    if (!canManageUsers()) throw new Error('Accès non autorisé')
+  function upsertUser(payload: {
+    id?: string
+    username: string
+    password: string
+    fullName: string
+    role: CfRole
+    isActive: boolean
+  }) {
+    if (!canManageUsers() || !currentOrg.value) throw new Error('Accès non autorisé')
     if (payload.id) {
       const user = db.value.users.find((u) => u.id === payload.id)
       if (!user) throw new Error('Utilisateur introuvable')
@@ -576,6 +762,7 @@ export const useCfStore = defineStore('chambreFroide', () => {
         fullName: payload.fullName,
         role: payload.role,
         isActive: payload.isActive,
+        organizationId: currentOrg.value.id,
       })
       log('Modification utilisateur', user.username)
       persist()
@@ -587,6 +774,7 @@ export const useCfStore = defineStore('chambreFroide', () => {
     if (exists) throw new Error('Cet identifiant existe déjà')
     const user: CfUser = {
       id: uid('user'),
+      organizationId: currentOrg.value.id,
       username: payload.username,
       password: payload.password,
       fullName: payload.fullName,
@@ -742,34 +930,85 @@ export const useCfStore = defineStore('chambreFroide', () => {
   }
 
   function backup(): string {
+    if (!currentOrg.value) throw new Error('Aucune organisation active')
     log('Sauvegarde manuelle')
-    return exportDatabaseJson()
+    return exportOrgWorkspaceJson(currentOrg.value.id)
+  }
+
+  function backupPlatform(): string {
+    if (!canManageUsers()) throw new Error('Accès non autorisé')
+    log('Sauvegarde plateforme')
+    return exportPlatformJson()
   }
 
   function restore(json: string) {
-    db.value = importDatabaseJson(json)
+    platform.value = importPlatformJson(json)
+    const stored = readStoredSession()
+    if (stored && platform.value.workspaces[stored.organizationId]) {
+      bindSession(stored)
+    } else if (currentOrg.value && platform.value.workspaces[currentOrg.value.id]) {
+      const org = platform.value.organizations.find((o) => o.id === currentOrg.value!.id)!
+      const user = platform.value.workspaces[org.id].users.find((u) => u.id === currentUser.value?.id)
+        || platform.value.workspaces[org.id].users[0]
+      if (user) {
+        bindSession({
+          organizationId: org.id,
+          organizationCode: org.code,
+          organizationName: org.name,
+          user,
+        })
+      }
+    }
     log('Restauration des données')
   }
 
   function resetDemoData() {
-    if (!canManageUsers()) throw new Error('Accès non autorisé')
-    db.value = createSeedDatabase()
+    if (!canManageUsers() || !currentOrg.value) throw new Error('Accès non autorisé')
+    const orgId = currentOrg.value.id
+    const admin = currentUser.value
+    db.value = createDemoWorkspace(orgId)
+    if (admin) {
+      const target = db.value.users.find((u) => u.role === 'Administrateur') || db.value.users[0]
+      if (target) {
+        target.username = admin.username
+        target.password = admin.password
+        target.fullName = admin.fullName
+        target.organizationId = orgId
+        bindSession({
+          organizationId: orgId,
+          organizationCode: currentOrg.value.code,
+          organizationName: currentOrg.value.name,
+          user: target,
+        })
+      }
+    }
     persist()
-    log('Réinitialisation des données démo')
+    log('Réinitialisation des données de l’organisation')
   }
 
-  // Auto backup every hour
+  function resetPlatformDemo() {
+    if (!canManageUsers()) throw new Error('Accès non autorisé')
+    platform.value = createSeedPlatform()
+    savePlatform(platform.value)
+    bindSession(null)
+  }
+
+  // Auto backup every hour (organisation courante)
   if (typeof window !== 'undefined') {
-    const AUTO_KEY = 'cf_auto_backup_v2'
+    const AUTO_KEY = 'cf_auto_backup_v3'
     const last = Number(localStorage.getItem('cf_last_auto_backup') || 0)
-    if (Date.now() - last > 60 * 60 * 1000) {
-      localStorage.setItem(AUTO_KEY, exportDatabaseJson())
-      localStorage.setItem('cf_last_auto_backup', String(Date.now()))
+    const doAuto = () => {
+      try {
+        if (currentOrg.value) {
+          localStorage.setItem(AUTO_KEY, exportOrgWorkspaceJson(currentOrg.value.id))
+          localStorage.setItem('cf_last_auto_backup', String(Date.now()))
+        }
+      } catch {
+        // ignore
+      }
     }
-    setInterval(() => {
-      localStorage.setItem(AUTO_KEY, exportDatabaseJson())
-      localStorage.setItem('cf_last_auto_backup', String(Date.now()))
-    }, 60 * 60 * 1000)
+    if (Date.now() - last > 60 * 60 * 1000) doAuto()
+    setInterval(doAuto, 60 * 60 * 1000)
   }
 
   watch(
@@ -781,8 +1020,12 @@ export const useCfStore = defineStore('chambreFroide', () => {
   )
 
   return {
+    platform,
     db,
+    session,
+    currentOrg,
     currentUser,
+    organizations,
     searchQuery,
     unpaidInvoices,
     paidToday,
@@ -798,7 +1041,10 @@ export const useCfStore = defineStore('chambreFroide', () => {
     etatSorties,
     etatSortiesResume,
     login,
+    registerOrganization,
+    updateOrganization,
     logout,
+    leaveOrganization,
     hasRole,
     canManagePrices,
     canSuperviseStock,
@@ -822,9 +1068,12 @@ export const useCfStore = defineStore('chambreFroide', () => {
     yearlyReport,
     globalSearch,
     backup,
+    backupPlatform,
     restore,
     resetDemoData,
+    resetPlatformDemo,
     reloadFromStorage,
+    findOrgByCode,
     formatMoney,
     log,
   }

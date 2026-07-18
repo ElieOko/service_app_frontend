@@ -13,6 +13,7 @@ const isMobileOpen = computed(() => mobileOpen.value)
 const links = computed(() => {
   const all = [
     { to: '/cf', name: 'cf_home', label: 'Tableau de bord', roles: null as string[] | null },
+    { to: '/cf/organisation', name: 'cf_organisation', label: 'Mon organisation', roles: null },
     { to: '/cf/vente', name: 'cf_vente', label: 'Vente / Facturation', roles: ['Facturier', 'Administrateur', 'Directeur'] },
     { to: '/cf/caisse', name: 'cf_caisse', label: 'Caisse', roles: ['Caissier', 'Administrateur', 'Directeur'] },
     { to: '/cf/stock', name: 'cf_stock', label: 'Stocks', roles: null },
@@ -49,8 +50,8 @@ function closeMobile() {
     <div class="cf-side__brand">
       <span class="cf-side__mark">CF</span>
       <div>
-        <p class="cf-side__title">Chambre Froide</p>
-        <p class="cf-side__sub">Service App V2</p>
+        <p class="cf-side__title">{{ store.currentOrg?.name || 'Chambre Froide' }}</p>
+        <p class="cf-side__sub">Code {{ store.currentOrg?.code || '—' }}</p>
       </div>
     </div>
 

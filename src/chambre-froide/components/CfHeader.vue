@@ -15,6 +15,11 @@ function logout() {
   router.push('/cf/login')
 }
 
+function switchOrg() {
+  store.logout()
+  router.push('/cf/login')
+}
+
 function switchModule() {
   store.logout()
   clearAppMode()
@@ -27,7 +32,7 @@ function switchModule() {
     <div class="cf-header__left">
       <button type="button" class="cf-header__menu-btn" @click="$emit('toggle-sidebar')">☰</button>
       <div>
-        <p class="cf-header__eyebrow">Chambre froide</p>
+        <p class="cf-header__eyebrow">{{ store.currentOrg?.name || 'Chambre froide' }}</p>
         <h1 class="cf-header__title">Gestion en temps réel</h1>
       </div>
     </div>
@@ -39,10 +44,11 @@ function switchModule() {
       <div class="cf-header__user" @click="open = !open">
         <div>
           <strong>{{ store.currentUser?.fullName }}</strong>
-          <small>{{ store.currentUser?.role }}</small>
+          <small>{{ store.currentUser?.role }} · {{ store.currentOrg?.code }}</small>
         </div>
         <div v-if="open" class="cf-header__menu">
           <button type="button" @click="logout">Déconnexion</button>
+          <button type="button" @click="switchOrg">Changer d’organisation</button>
           <button type="button" @click="switchModule">Changer de module</button>
         </div>
       </div>
