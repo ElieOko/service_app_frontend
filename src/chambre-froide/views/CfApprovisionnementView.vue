@@ -12,14 +12,14 @@ const newProduct = ref({
   salePrice: 0,
   stockInitial: 0,
   stockMin: 5,
-  supplier: '',
+  supplierId: '',
 })
 
 const supply = ref({
   productId: '',
   quantity: 0,
   purchasePrice: 0,
-  supplier: '',
+  supplierId: '',
 })
 
 const adjust = ref({
@@ -31,7 +31,10 @@ const adjust = ref({
 
 function createProduct() {
   try {
-    store.addProduct({ ...newProduct.value })
+    store.addProduct({
+      ...newProduct.value,
+      supplierId: newProduct.value.supplierId || undefined,
+    })
     toast('Produit enregistré')
     newProduct.value = {
       name: '',
@@ -40,7 +43,7 @@ function createProduct() {
       salePrice: 0,
       stockInitial: 0,
       stockMin: 5,
-      supplier: '',
+      supplierId: '',
     }
   } catch (e: any) {
     toast(e.message || 'Erreur')
@@ -49,9 +52,18 @@ function createProduct() {
 
 function doSupply() {
   try {
-    store.supplyStock({ ...supply.value })
+    if (!supply.value.supplierId) {
+      toast('Sélectionnez un fournisseur')
+      return
+    }
+    store.supplyStock({
+      productId: supply.value.productId,
+      quantity: supply.value.quantity,
+      purchasePrice: supply.value.purchasePrice,
+      supplierId: supply.value.supplierId,
+    })
     toast('Approvisionnement enregistré')
-    supply.value = { productId: '', quantity: 0, purchasePrice: 0, supplier: '' }
+    supply.value = { productId: '', quantity: 0, purchasePrice: 0, supplierId: '' }
   } catch (e: any) {
     toast(e.message || 'Erreur')
   }
@@ -84,7 +96,16 @@ function doAdjust() {
         <label>Prix de vente <input v-model.number="newProduct.salePrice" type="number" min="0" step="0.01" /></label>
         <label>Stock initial <input v-model.number="newProduct.stockInitial" type="number" min="0" /></label>
         <label>Seuil alerte <input v-model.number="newProduct.stockMin" type="number" min="0" /></label>
-        <label>Fournisseur <input v-model="newProduct.supplier" /></label>
+        <label>
+          Fournisseur
+          <select v-model="newProduct.supplierId">
+            <option value="">— Optionnel —</option>
+            <option v-for="s in store.activeSuppliers" :key="s.id" :value="s.id">{{ s.name }}</option>
+          </select>
+        </label>
+        <p class="hint">
+          <router-link to="/cf/fournisseurs">Gérer la liste des fournisseurs</router-link>
+        </p>
         <button type="submit">Enregistrer le produit</button>
       </form>
 
@@ -99,7 +120,13 @@ function doAdjust() {
         </label>
         <label>Quantité <input v-model.number="supply.quantity" type="number" min="1" required /></label>
         <label>Prix d’achat <input v-model.number="supply.purchasePrice" type="number" min="0" step="0.01" required /></label>
-        <label>Fournisseur <input v-model="supply.supplier" required /></label>
+        <label>
+          Fournisseur
+          <select v-model="supply.supplierId" required>
+            <option value="">— Choisir —</option>
+            <option v-for="s in store.activeSuppliers" :key="s.id" :value="s.id">{{ s.name }}</option>
+          </select>
+        </label>
         <p class="hint">Valeur totale: {{ (supply.quantity * supply.purchasePrice).toFixed(2) }}</p>
         <button type="submit">Enregistrer l’entrée</button>
       </form>
@@ -159,6 +186,7 @@ input, select {
   font: inherit;
 }
 small, .hint { color: #5d7a84; font-weight: 500; }
+.hint a { color: #0f7f7a; font-weight: 700; }
 button {
   border: 0;
   background: #0f7f7a;

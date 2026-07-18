@@ -73,6 +73,8 @@ import CfUsersView from '../chambre-froide/views/CfUsersView.vue'
 import CfLogsView from '../chambre-froide/views/CfLogsView.vue'
 //@ts-ignore
 import CfBackupView from '../chambre-froide/views/CfBackupView.vue'
+//@ts-ignore
+import CfFournisseursView from '../chambre-froide/views/CfFournisseursView.vue'
 import { getUser } from '@/stores/user'
 import { getAppMode } from '@/stores/appMode'
 import { CF_SESSION_KEY } from '@/chambre-froide/db'
@@ -130,6 +132,12 @@ const routes: RouteRecordRaw[] = [
     name: 'cf_appro',
     component: CfApprovisionnementView,
     meta: { layout: 'cf', requiresCfAuth: true, module: 'chambre_froide', roles: ['Administrateur', 'Directeur', 'Superviseur'] },
+  },
+  {
+    path: '/cf/fournisseurs',
+    name: 'cf_fournisseurs',
+    component: CfFournisseursView,
+    meta: { layout: 'cf', requiresCfAuth: true, module: 'chambre_froide' },
   },
   {
     path: '/cf/prix',

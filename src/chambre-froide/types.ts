@@ -31,6 +31,16 @@ export interface CfUser {
   createdAt: string
 }
 
+export interface CfSupplier {
+  id: string
+  name: string
+  phone?: string
+  address?: string
+  notes?: string
+  isActive: boolean
+  createdAt: string
+}
+
 export interface CfProduct {
   id: string
   name: string
@@ -41,6 +51,7 @@ export interface CfProduct {
   stockCurrent: number
   stockMin: number
   supplier?: string
+  supplierId?: string
   createdAt: string
   updatedAt: string
 }
@@ -129,6 +140,7 @@ export interface CfNotification {
 export interface CfDatabase {
   users: CfUser[]
   products: CfProduct[]
+  suppliers: CfSupplier[]
   invoices: CfInvoice[]
   movements: CfStockMovement[]
   priceHistory: CfPriceHistory[]

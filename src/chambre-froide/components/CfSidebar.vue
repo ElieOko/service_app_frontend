@@ -16,6 +16,7 @@ const links = computed(() => {
     { to: '/cf/vente', name: 'cf_vente', label: 'Vente / Facturation', roles: ['Facturier', 'Administrateur', 'Directeur'] },
     { to: '/cf/caisse', name: 'cf_caisse', label: 'Caisse', roles: ['Caissier', 'Administrateur', 'Directeur'] },
     { to: '/cf/stock', name: 'cf_stock', label: 'Stocks', roles: null },
+    { to: '/cf/fournisseurs', name: 'cf_fournisseurs', label: 'Fournisseurs', roles: null },
     { to: '/cf/approvisionnement', name: 'cf_appro', label: 'Approvisionnement', roles: ['Administrateur', 'Directeur', 'Superviseur'] },
     { to: '/cf/prix', name: 'cf_prix', label: 'Gestion des prix', roles: ['Administrateur', 'Directeur'] },
     { to: '/cf/rapports', name: 'cf_rapports', label: 'Rapports', roles: ['Administrateur', 'Directeur', 'Superviseur'] },

@@ -123,7 +123,7 @@ header {
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
-  align-items: end;
+  align-items: flex-end;
 }
 header h2 { margin: 0; font-family: Fraunces, Georgia, serif; color: #0b3d4a; }
 header p { margin: 0.35rem 0 0; color: #5d7a84; }
