@@ -25,13 +25,20 @@ Depuis Chambre froide → **Créer une nouvelle organisation** (`/cf/register-or
 
 ### Organisations démo
 
-| Code org   | Identifiant | Mot de passe | Notes |
-|------------|-------------|--------------|-------|
-| `DEMO`     | facturier   | fac123       | Données démo préchargées |
-| `DEMO`     | admin       | admin123     | Admin org démo |
-| `FROIDPLUS`| admin       | froid123     | Organisation vide séparée |
+Code org `DEMO` — **mot de passe = identifiant** :
 
-Autres comptes sur `DEMO` : directeur/dir123 · superviseur/sup123 · caissier/cai123
+| Identifiant   | Rôle           |
+|---------------|----------------|
+| `caissier`    | Caissier       |
+| `superviseur` | Superviseur    |
+| `directeur`   | Directeur      |
+| `facturier`   | Facturier      |
+| `admin`       | Administrateur |
+
+Autre org : `FROIDPLUS` / `admin` / `admin`
+
+Produits démo : vivres frais RDC (cuisse de poulet, poisson capitaine, tilapia, viande de bœuf, etc.)  
+Fournisseurs : Aviculture Kongo Frais, Pêcherie Fleuve Congo, Boucherie Mama Nzuzi, Frigo Gombe SARL, Fermes Bateke.
 
 ## Fonctionnalités chambre froide
 
