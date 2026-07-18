@@ -14,15 +14,24 @@ npm run dev
 
 Au lancement, l’écran de sélection propose Boutique ou Chambre froide.
 
-## Chambre froide — comptes démo
+## Chambre froide — multi-organisations
 
-| Identifiant   | Mot de passe | Rôle           |
-|---------------|--------------|----------------|
-| admin         | admin123     | Administrateur |
-| directeur     | dir123       | Directeur      |
-| superviseur   | sup123       | Superviseur    |
-| facturier     | fac123       | Facturier      |
-| caissier      | cai123       | Caissier       |
+Chaque organisation a un **code d’accès** et ses propres données isolées
+(stocks, factures, utilisateurs, fournisseurs, rapports).
+
+### Créer une organisation
+
+Depuis Chambre froide → **Créer une nouvelle organisation** (`/cf/register-org`).
+
+### Organisations démo
+
+| Code org   | Identifiant | Mot de passe | Notes |
+|------------|-------------|--------------|-------|
+| `DEMO`     | facturier   | fac123       | Données démo préchargées |
+| `DEMO`     | admin       | admin123     | Admin org démo |
+| `FROIDPLUS`| admin       | froid123     | Organisation vide séparée |
+
+Autres comptes sur `DEMO` : directeur/dir123 · superviseur/sup123 · caissier/cai123
 
 ## Fonctionnalités chambre froide
 

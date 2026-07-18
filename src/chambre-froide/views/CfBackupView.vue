@@ -8,13 +8,28 @@ const store = useCfStore()
 const importText = ref('')
 
 function manualBackup() {
-  const json = store.backup()
-  downloadBlob(`chambre-froide-backup-${Date.now()}.json`, json, 'application/json')
-  toast('Sauvegarde téléchargée')
+  try {
+    const json = store.backup()
+    const code = store.currentOrg?.code || 'org'
+    downloadBlob(`cf-${code}-backup-${Date.now()}.json`, json, 'application/json')
+    toast('Sauvegarde de l’organisation téléchargée')
+  } catch (e: any) {
+    toast(e.message || 'Erreur')
+  }
+}
+
+function platformBackup() {
+  try {
+    const json = store.backupPlatform()
+    downloadBlob(`cf-platform-backup-${Date.now()}.json`, json, 'application/json')
+    toast('Sauvegarde plateforme téléchargée')
+  } catch (e: any) {
+    toast(e.message || 'Erreur')
+  }
 }
 
 function restoreAuto() {
-  const raw = localStorage.getItem('cf_auto_backup_v2')
+  const raw = localStorage.getItem('cf_auto_backup_v3') || localStorage.getItem('cf_auto_backup_v2')
   if (!raw) {
     toast('Aucune sauvegarde automatique trouvée')
     return
@@ -49,10 +64,10 @@ function onFile(e: Event) {
 }
 
 function resetDemo() {
-  if (!confirm('Réinitialiser les données de démonstration ?')) return
+  if (!confirm('Réinitialiser les données de CETTE organisation ?')) return
   try {
     store.resetDemoData()
-    toast('Données démo réinitialisées')
+    toast('Données de l’organisation réinitialisées')
   } catch (e: any) {
     toast(e.message || 'Erreur')
   }
@@ -63,19 +78,24 @@ function resetDemo() {
   <div class="backup">
     <header>
       <h2>Sauvegarde & restauration</h2>
-      <p>Sauvegardes automatiques horaires, manuelles, et restauration.</p>
+      <p>
+        Sauvegarde isolée pour <strong>{{ store.currentOrg?.name }}</strong>
+        ({{ store.currentOrg?.code }}).
+      </p>
     </header>
 
     <section class="panel">
       <h3>Actions</h3>
       <div class="actions">
-        <button type="button" @click="manualBackup">Sauvegarde manuelle (JSON)</button>
-        <button type="button" class="secondary" @click="restoreAuto">Restaurer la dernière auto-sauvegarde</button>
-        <button type="button" class="danger" @click="resetDemo">Réinitialiser la démo</button>
+        <button type="button" @click="manualBackup">Sauvegarder cette organisation</button>
+        <button v-if="store.canManageUsers()" type="button" class="secondary" @click="platformBackup">
+          Sauvegarder toute la plateforme
+        </button>
+        <button type="button" class="secondary" @click="restoreAuto">Restaurer l’auto-sauvegarde</button>
+        <button type="button" class="danger" @click="resetDemo">Réinitialiser cette organisation</button>
       </div>
       <p class="hint">
-        Une sauvegarde automatique est enregistrée localement chaque heure et synchronisée entre les postes
-        via BroadcastChannel / localStorage.
+        Les sauvegardes d’organisation n’affectent pas les autres organisations présentes sur la plateforme.
       </p>
     </section>
 

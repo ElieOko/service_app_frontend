@@ -21,8 +21,21 @@ export type NotificationType =
   | 'facture_annulee'
   | 'acces_refuse'
 
+export interface CfOrganization {
+  id: string
+  name: string
+  /** Code unique pour rejoindre l'organisation (ex: DEMO, FROID-KIN) */
+  code: string
+  phone?: string
+  email?: string
+  address?: string
+  isActive: boolean
+  createdAt: string
+}
+
 export interface CfUser {
   id: string
+  organizationId: string
   username: string
   password: string
   fullName: string
@@ -137,7 +150,8 @@ export interface CfNotification {
   createdAt: string
 }
 
-export interface CfDatabase {
+/** Données métier isolées d'une organisation */
+export interface CfWorkspace {
   users: CfUser[]
   products: CfProduct[]
   suppliers: CfSupplier[]
@@ -148,5 +162,20 @@ export interface CfDatabase {
   notifications: CfNotification[]
   invoiceCounter: number
   receiptCounter: number
+}
+
+/** @deprecated alias — utiliser CfWorkspace */
+export type CfDatabase = CfWorkspace
+
+export interface CfPlatformDatabase {
+  organizations: CfOrganization[]
+  workspaces: Record<string, CfWorkspace>
   version: number
+}
+
+export interface CfSession {
+  organizationId: string
+  organizationCode: string
+  organizationName: string
+  user: CfUser
 }

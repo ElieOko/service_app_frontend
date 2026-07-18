@@ -50,6 +50,10 @@ import ModeSelectView from '../views/ModeSelectView.vue'
 //@ts-ignore
 import CfLoginView from '../chambre-froide/views/CfLoginView.vue'
 //@ts-ignore
+import CfRegisterOrgView from '../chambre-froide/views/CfRegisterOrgView.vue'
+//@ts-ignore
+import CfOrganisationView from '../chambre-froide/views/CfOrganisationView.vue'
+//@ts-ignore
 import CfDashboardView from '../chambre-froide/views/CfDashboardView.vue'
 //@ts-ignore
 import CfVenteView from '../chambre-froide/views/CfVenteView.vue'
@@ -77,16 +81,10 @@ import CfBackupView from '../chambre-froide/views/CfBackupView.vue'
 import CfFournisseursView from '../chambre-froide/views/CfFournisseursView.vue'
 import { getUser } from '@/stores/user'
 import { getAppMode } from '@/stores/appMode'
-import { CF_SESSION_KEY } from '@/chambre-froide/db'
+import { readSession } from '@/chambre-froide/db'
 
 function getCfSession() {
-  const raw = localStorage.getItem(CF_SESSION_KEY)
-  if (!raw) return null
-  try {
-    return JSON.parse(raw)
-  } catch {
-    return null
-  }
+  return readSession()
 }
 
 const routes: RouteRecordRaw[] = [
@@ -104,9 +102,21 @@ const routes: RouteRecordRaw[] = [
     meta: { layout: 'empty', module: 'chambre_froide' },
   },
   {
+    path: '/cf/register-org',
+    name: 'cf_register_org',
+    component: CfRegisterOrgView,
+    meta: { layout: 'empty', module: 'chambre_froide' },
+  },
+  {
     path: '/cf',
     name: 'cf_home',
     component: CfDashboardView,
+    meta: { layout: 'cf', requiresCfAuth: true, module: 'chambre_froide' },
+  },
+  {
+    path: '/cf/organisation',
+    name: 'cf_organisation',
+    component: CfOrganisationView,
     meta: { layout: 'cf', requiresCfAuth: true, module: 'chambre_froide' },
   },
   {
@@ -363,12 +373,12 @@ router.beforeEach((to, _from, next) => {
 
   if (to.meta.requiresCfAuth) {
     const session = getCfSession()
-    if (!session) {
+    if (!session?.user) {
       next('/cf/login')
       return
     }
     const roles = to.meta.roles as string[] | undefined
-    if (roles && !roles.includes(session.role)) {
+    if (roles && !roles.includes(session.user.role)) {
       next('/cf')
       return
     }
