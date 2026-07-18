@@ -35,7 +35,7 @@ function choose(mode: AppMode) {
           <span class="mode-card__kicker">Nouveau · V2</span>
           <span class="mode-card__name">Chambre froide</span>
           <span class="mode-card__desc">
-            Vente facturier → caisse, stocks, prix, rapports, sauvegarde et synchronisation temps réel.
+            Multi-organisations isolées · vente facturier → caisse · stocks · prix · rapports · sauvegarde.
           </span>
           <span class="mode-card__cta">Ouvrir la chambre froide</span>
         </button>
