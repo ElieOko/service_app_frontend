@@ -1,40 +1,42 @@
-# side_client_app
+# Service App V2 — Boutique & Chambre froide
 
-This template should help get you started developing with Vue 3 in Vite.
+Application Vue 3 permettant de choisir entre :
 
-## Recommended IDE Setup
+- **Boutique** : module existant (facturation, stocks, dettes, marketeurs, versements)
+- **Chambre froide** : nouveau module V2 de gestion complète
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
-
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
-
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
-
-1. Disable the built-in TypeScript Extension
-    1) Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-    2) Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
+## Démarrage
 
 ```sh
 npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+Au lancement, l’écran de sélection propose Boutique ou Chambre froide.
 
-```sh
-npm run build
-```
+## Chambre froide — comptes démo
+
+| Identifiant   | Mot de passe | Rôle           |
+|---------------|--------------|----------------|
+| admin         | admin123     | Administrateur |
+| directeur     | dir123       | Directeur      |
+| superviseur   | sup123       | Superviseur    |
+| facturier     | fac123       | Facturier      |
+| caissier      | cai123       | Caissier       |
+
+## Fonctionnalités chambre froide
+
+1. Processus de vente facturier → facture → caisse → reçu → stock
+2. Gestion automatique des stocks (entrées, sorties, valeur)
+3. Approvisionnement, corrections, pertes, périmés (historisés)
+4. Gestion des prix (Admin / Directeur) avec historique
+5. Tableau de bord temps réel
+6. Rapports journalier / hebdo / mensuel / annuel (PDF & Excel)
+7. Recherche globale
+8. Sécurité par rôles + journal d’activité
+9. Notifications (rupture, stock faible, annulation, accès refusé)
+10. Sauvegardes auto / manuelles et restauration
+11. Synchronisation multi-onglets (BroadcastChannel + localStorage)
+12. Impression factures, reçus, rapports, états de stock
+
+Les données du module chambre froide sont persistées localement (démo autonome). Le module boutique continue d’utiliser l’API existante.

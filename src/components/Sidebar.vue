@@ -1,15 +1,25 @@
 
 <script setup lang="ts">
 import { useSidebar } from '@/utils/constant/fun';
+import { clearAppMode } from '@/stores/appMode'
+import { clearUser } from '@/stores/user'
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 const { isOpen } = useSidebar()
+const router = useRouter()
 const activeClass = ref(
   'bg-gray-600 bg-opacity-25 text-gray-100 border-gray-100',
 )
 const inactiveClass = ref(
   'border-gray-900 text-gray-500 hover:bg-gray-600 hover:bg-opacity-25 hover:text-gray-100',
 )
+
+function switchModule() {
+  clearUser()
+  clearAppMode()
+  router.push('/select')
+}
 </script>
 
 <template>
@@ -216,6 +226,14 @@ const inactiveClass = ref(
             </svg>
             <span class="mx-4">Versement</span>
           </router-link>
+
+          <button
+            type="button"
+            class="flex items-center w-full px-6 py-2 mt-8 duration-200 border-l-4 border-gray-900 text-gray-400 hover:bg-gray-600 hover:bg-opacity-25 hover:text-gray-100"
+            @click="switchModule"
+          >
+            <span class="mx-4">Changer de module (V2)</span>
+          </button>
       </nav>
     </div>
   </div>
