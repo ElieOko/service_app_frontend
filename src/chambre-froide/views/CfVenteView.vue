@@ -203,7 +203,7 @@ input, select {
 .preview {
   display: flex;
   flex-direction: column;
-  justify-content: end;
+  justify-content: flex-end;
   gap: 0.2rem;
   color: #0f7f7a;
 }

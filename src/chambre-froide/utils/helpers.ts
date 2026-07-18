@@ -51,16 +51,34 @@ export function toCsv(rows: Array<Record<string, unknown>>): string {
   ].join('\n')
 }
 
-export function printHtml(title: string, bodyHtml: string) {
-  const win = window.open('', '_blank', 'noopener,noreferrer,width=800,height=900')
-  if (!win) return
+/** Ouvre un aperçu imprimable. Par défaut l'utilisateur voit le document puis clique Imprimer. */
+export function printHtml(title: string, bodyHtml: string, options?: { autoPrint?: boolean }) {
+  const autoPrint = options?.autoPrint ?? false
+  const win = window.open('', '_blank', 'width=900,height=960')
+  if (!win) {
+    alert('Impossible d’ouvrir l’aperçu. Autorisez les fenêtres pop-up pour ce site.')
+    return
+  }
   win.document.write(`<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <title>${title}</title>
   <style>
-    body { font-family: Georgia, 'Times New Roman', serif; color: #0f172a; padding: 24px; }
+    body { font-family: Georgia, 'Times New Roman', serif; color: #0f172a; padding: 24px; margin: 0; }
+    .toolbar {
+      position: sticky; top: 0; z-index: 10;
+      display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+      background: #0b3d4a; color: #fff; padding: 12px 16px; margin: -24px -24px 20px;
+    }
+    .toolbar strong { flex: 1; font-family: system-ui, sans-serif; font-size: 14px; }
+    .toolbar button {
+      border: 0; border-radius: 8px; padding: 8px 14px; font-weight: 700; cursor: pointer;
+      font-family: system-ui, sans-serif;
+    }
+    .toolbar .print { background: #1fa6a0; color: #fff; }
+    .toolbar .close { background: #fff; color: #0b3d4a; }
+    #print-root { max-width: 900px; margin: 0 auto; }
     h1 { font-size: 20px; margin: 0 0 8px; }
     h2 { font-size: 16px; margin: 16px 0 8px; }
     table { width: 100%; border-collapse: collapse; margin-top: 12px; }
@@ -68,13 +86,24 @@ export function printHtml(title: string, bodyHtml: string) {
     th { background: #f1f5f9; }
     .meta { color: #475569; font-size: 13px; line-height: 1.5; }
     .total { font-weight: bold; font-size: 15px; margin-top: 12px; }
-    @media print { button { display: none; } }
+    @media print {
+      .toolbar { display: none !important; }
+      body { padding: 0; }
+    }
   </style>
 </head>
 <body>
-  ${bodyHtml}
-  <script>window.onload = () => { window.print(); }</script>
+  <div class="toolbar">
+    <strong>Aperçu — ${title}</strong>
+    <button type="button" class="print" onclick="window.print()">Imprimer</button>
+    <button type="button" class="close" onclick="window.close()">Fermer</button>
+  </div>
+  <div id="print-root">${bodyHtml}</div>
+  <script>
+    ${autoPrint ? 'window.addEventListener("load", function () { setTimeout(function () { window.print(); }, 250); });' : ''}
+  </script>
 </body>
 </html>`)
   win.document.close()
+  win.focus()
 }

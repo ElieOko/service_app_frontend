@@ -10,6 +10,7 @@ import type {
   CfProduct,
   CfRole,
   CfStockMovement,
+  CfSupplier,
   CfUser,
   NotificationType,
   StockMovementType,
@@ -190,6 +191,111 @@ export const useCfStore = defineStore('chambreFroide', () => {
     }
   }
 
+  function resolveSupplierName(supplierId?: string, fallback?: string) {
+    if (supplierId) {
+      const found = db.value.suppliers.find((s) => s.id === supplierId)
+      if (found) return found.name
+    }
+    return fallback?.trim() || undefined
+  }
+
+  function upsertSupplier(payload: {
+    id?: string
+    name: string
+    phone?: string
+    address?: string
+    notes?: string
+    isActive?: boolean
+  }) {
+    if (!canSuperviseStock()) throw new Error('Accès non autorisé')
+    const name = payload.name.trim()
+    if (!name) throw new Error('Nom du fournisseur requis')
+
+    const duplicate = db.value.suppliers.find(
+      (s) => s.name.toLowerCase() === name.toLowerCase() && s.id !== payload.id,
+    )
+    if (duplicate) throw new Error('Ce fournisseur existe déjà')
+
+    if (payload.id) {
+      const supplier = db.value.suppliers.find((s) => s.id === payload.id)
+      if (!supplier) throw new Error('Fournisseur introuvable')
+      supplier.name = name
+      supplier.phone = payload.phone?.trim() || undefined
+      supplier.address = payload.address?.trim() || undefined
+      supplier.notes = payload.notes?.trim() || undefined
+      if (payload.isActive != null) supplier.isActive = payload.isActive
+      for (const p of db.value.products) {
+        if (p.supplierId === supplier.id) p.supplier = supplier.name
+      }
+      log('Modification fournisseur', supplier.name)
+      persist()
+      return supplier
+    }
+
+    const supplier: CfSupplier = {
+      id: uid('sup'),
+      name,
+      phone: payload.phone?.trim() || undefined,
+      address: payload.address?.trim() || undefined,
+      notes: payload.notes?.trim() || undefined,
+      isActive: payload.isActive ?? true,
+      createdAt: nowParts().iso,
+    }
+    db.value.suppliers.unshift(supplier)
+    log('Nouveau fournisseur', supplier.name)
+    persist()
+    return supplier
+  }
+
+  function supplierStats(supplier: CfSupplier) {
+    const products = db.value.products.filter(
+      (p) => p.supplierId === supplier.id || p.supplier === supplier.name,
+    )
+    const entries = db.value.movements.filter(
+      (m) => m.type === 'entree' && m.supplier === supplier.name,
+    )
+    const totalQty = entries.reduce((s, m) => s + m.quantity, 0)
+    const totalValue = entries.reduce((s, m) => s + (m.totalValue || 0), 0)
+    return {
+      productCount: products.length,
+      entriesCount: entries.length,
+      totalQty,
+      totalValue,
+    }
+  }
+
+  const activeSuppliers = computed(() =>
+    [...db.value.suppliers]
+      .filter((s) => s.isActive)
+      .sort((a, b) => a.name.localeCompare(b.name, 'fr')),
+  )
+
+  /** Sorties de stock : ventes, pertes et produits périmés. */
+  const etatSorties = computed(() =>
+    db.value.movements.filter((m) =>
+      ['sortie_vente', 'perte', 'perime'].includes(m.type),
+    ),
+  )
+
+  const etatSortiesResume = computed(() => {
+    const map = new Map<
+      string,
+      { productId: string; productName: string; quantite: number; valeur: number }
+    >()
+    for (const m of etatSorties.value) {
+      const prev = map.get(m.productId) ?? {
+        productId: m.productId,
+        productName: m.productName,
+        quantite: 0,
+        valeur: 0,
+      }
+      prev.quantite += m.quantity
+      prev.valeur += m.totalValue ?? m.quantity * (m.unitPrice ?? 0)
+      map.set(m.productId, prev)
+    }
+    return [...map.values()].sort((a, b) => b.quantite - a.quantite)
+  })
+
   function addProduct(payload: {
     name: string
     unit: string
@@ -198,9 +304,11 @@ export const useCfStore = defineStore('chambreFroide', () => {
     stockInitial: number
     stockMin: number
     supplier?: string
+    supplierId?: string
   }) {
     if (!canSuperviseStock()) throw new Error('Accès non autorisé')
     const { iso } = nowParts()
+    const supplierName = resolveSupplierName(payload.supplierId, payload.supplier)
     const product: CfProduct = {
       id: uid('prod'),
       name: payload.name.trim(),
@@ -210,7 +318,8 @@ export const useCfStore = defineStore('chambreFroide', () => {
       stockInitial: payload.stockInitial,
       stockCurrent: payload.stockInitial,
       stockMin: payload.stockMin,
-      supplier: payload.supplier,
+      supplier: supplierName,
+      supplierId: payload.supplierId,
       createdAt: iso,
       updatedAt: iso,
     }
@@ -283,21 +392,26 @@ export const useCfStore = defineStore('chambreFroide', () => {
     productId: string
     quantity: number
     purchasePrice: number
-    supplier: string
+    supplier?: string
+    supplierId?: string
   }) {
     if (!canSuperviseStock()) throw new Error('Accès non autorisé')
     const product = db.value.products.find((p) => p.id === payload.productId)
     if (!product) throw new Error('Produit introuvable')
+    const supplierName = resolveSupplierName(payload.supplierId, payload.supplier)
+    if (!supplierName) throw new Error('Fournisseur requis')
     product.purchasePrice = payload.purchasePrice
+    product.supplier = supplierName
+    product.supplierId = payload.supplierId
     const mov = addMovement({
       type: 'entree',
       productId: payload.productId,
       quantity: payload.quantity,
       unitPrice: payload.purchasePrice,
-      supplier: payload.supplier,
+      supplier: supplierName,
       reason: 'Approvisionnement',
     })
-    log('Approvisionnement', `${product.name} +${payload.quantity}`)
+    log('Approvisionnement', `${product.name} +${payload.quantity} (${supplierName})`)
     return mov
   }
 
@@ -680,6 +794,9 @@ export const useCfStore = defineStore('chambreFroide', () => {
     valeurTotaleStock,
     produitsPlusVendus,
     unreadNotifications,
+    activeSuppliers,
+    etatSorties,
+    etatSortiesResume,
     login,
     logout,
     hasRole,
@@ -687,6 +804,8 @@ export const useCfStore = defineStore('chambreFroide', () => {
     canSuperviseStock,
     canManageUsers,
     productStats,
+    supplierStats,
+    upsertSupplier,
     addProduct,
     supplyStock,
     stockAdjustment,
